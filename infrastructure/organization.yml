@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09-OC'
+Description: default template generated for organization with master account 123644281325
+
+Organization:
+  ManagementAccount:
+    Type: OC::ORG::MasterAccount
+    Properties:
+      AccountName: yaivanovaws
+      AccountId: '123644281325'
+      RootEmail: ivanovv.aws@outlook.com
+
+  OrganizationRoot:
+    Type: OC::ORG::OrganizationRoot
+    Properties:
+      DefaultOrganizationAccessRoleName: OrganizationAccountAccessRole
+
+  ProdOU:
+    Type: OC::ORG::OrganizationalUnit
+    Properties:
+      OrganizationalUnitName: prod-OU
+      Accounts: !Ref ProductionAccount
+
+  TestOuOU:
+    Type: OC::ORG::OrganizationalUnit
+    Properties:
+      OrganizationalUnitName: test-OU
+      Accounts: !Ref TestAccount
+
+  ProductionAccount:
+    Type: OC::ORG::Account
+    Properties:
+      AccountName: production-account
+      AccountId: '064057453791'
+      RootEmail: ivanovv.aws.production@outlook.com
+
+  TestAccount:
+    Type: OC::ORG::Account
+    Properties:
+      AccountName: test-account
+      AccountId: '198226511774'
+      RootEmail: ivanovv.aws.test@outlook.com
