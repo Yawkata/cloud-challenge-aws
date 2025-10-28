@@ -17,13 +17,13 @@ Organization:
   ProdOU:
     Type: OC::ORG::OrganizationalUnit
     Properties:
-      OrganizationalUnitName: prod1-OU
+      OrganizationalUnitName: prod-OU
       Accounts: !Ref ProductionAccount
 
   TestOuOU:
     Type: OC::ORG::OrganizationalUnit
     Properties:
-      OrganizationalUnitName: test1-OU
+      OrganizationalUnitName: test-OU
       Accounts: !Ref TestAccount
 
   ProductionAccount:
