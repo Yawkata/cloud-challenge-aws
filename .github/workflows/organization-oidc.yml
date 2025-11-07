@@ -18,8 +18,8 @@ jobs:
       - name: Configure AWS credentials from OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::123644281325:role/github-action-role
-          aws-region: eu-north-1
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Install org-formation and update org
         run: |
