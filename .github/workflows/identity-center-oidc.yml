@@ -1,4 +1,4 @@
-name: identity-center-cicd
+name: identity-center-oicd
 
 on:
   push:
