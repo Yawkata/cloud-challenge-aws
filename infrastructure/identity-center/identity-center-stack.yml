@@ -46,7 +46,7 @@ Resources:
       Description: View-only access permission set
       SessionDuration: PT1H
       ManagedPolicies:
-        - arn:aws:iam::aws:policy/ViewOnlyAccess
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
 
   ViewOnlyToProductionAssignment:
     Type: AWS::SSO::Assignment
