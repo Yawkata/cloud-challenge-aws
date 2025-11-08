@@ -31,15 +31,8 @@ jobs:
       - name: Debug CloudFormation Failure
         if: failure()
         run: |
+          echo "CloudFormation stack failed — showing recent failure events:"
           aws cloudformation describe-stack-events \
-            --stack-name identity-center-permission-sets \
-            --query "StackEvents[?ResourceStatus=='CREATE_FAILED'].[LogicalResourceId, ResourceStatusReason]" \
-            --output table
-
-      - name: Debug Assignments Failure
-        if: failure()
-        run: |
-          aws cloudformation describe-stack-events \
-            --stack-name identity-center-assignments \
-            --query "StackEvents[?ResourceStatus=='CREATE_FAILED'].[LogicalResourceId, ResourceStatusReason]" \
+            --stack-name identity-center \
+            --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='ROLLBACK_FAILED'].[Timestamp,LogicalResourceId,ResourceStatus,ResourceStatusReason]" \
             --output table
