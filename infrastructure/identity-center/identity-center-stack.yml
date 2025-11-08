@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Identity Center Permission Sets + Assignments
+
+Resources:
+  PowerUserAccessPermissionSet:
+    Type: AWS::SSO::PermissionSet
+    Properties:
+      InstanceArn: arn:aws:sso:::instance/ssoins-6508a41e8141bf1d
+      Name: PowerUserAccess
+      Description: Power user permission
+      SessionDuration: PT1H
+      ManagedPolicies:
+        - arn:aws:iam::aws:policy/PowerUserAccess
+
+  AdminToProductionAssignment:
+    Type: AWS::SSO::Assignment
+    DependsOn: PowerUserAccessPermissionSet
+    Properties:
+      InstanceArn: arn:aws:sso:::instance/ssoins-6508a41e8141bf1d
+      TargetType: AWS_ACCOUNT
+      TargetId: 064057453791
+      PermissionSetArn: !GetAtt PowerUserAccessPermissionSet.PermissionSetArn
+      PrincipalType: USER
+      PrincipalId: c05ca9ec-8011-70d5-3678-cec776a124cc
+
+  AdminToTestAssignment:
+    Type: AWS::SSO::Assignment
+    DependsOn: PowerUserAccessPermissionSet
+    Properties:
+      InstanceArn: arn:aws:sso:::instance/ssoins-6508a41e8141bf1d
+      TargetType: AWS_ACCOUNT
+      TargetId: 198226511774
+      PermissionSetArn: !GetAtt PowerUserAccessPermissionSet.PermissionSetArn
+      PrincipalType: USER
+      PrincipalId: c05ca9ec-8011-70d5-3678-cec776a124cc

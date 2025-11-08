@@ -21,18 +21,11 @@ jobs:
           role-to-assume: arn:aws:iam::123644281325:role/github-action-identity-center
           aws-region: eu-north-1
 
-      - name: Deploy Permission Sets
+      - name: Deploy Identity Center Stack
         run: |
           aws cloudformation deploy \
-            --template-file infrastructure/identity-center/permission-sets.yml \
-            --stack-name identity-center-permission-sets \
-            --capabilities CAPABILITY_NAMED_IAM
-
-      - name: Deploy Assignments
-        run: |
-          aws cloudformation deploy \
-            --template-file infrastructure/identity-center/assignments.yml \
-            --stack-name identity-center-assignments \
+            --template-file infrastructure/identity-center/identity-center-stack.yml \
+            --stack-name identity-center \
             --capabilities CAPABILITY_NAMED_IAM
 
       - name: Debug CloudFormation Failure
