@@ -38,7 +38,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Replace PowerUserAccess with ViewOnlyAccess in Identity Center
 
 Resources:
-  # --- New Permission Set ---
   ViewOnlyAccessPermissionSet:
     Type: AWS::SSO::PermissionSet
     Properties:
@@ -49,7 +48,6 @@ Resources:
       ManagedPolicies:
         - arn:aws:iam::aws:policy/ViewOnlyAccess
 
-  # --- New Assignments ---
   ViewOnlyToProductionAssignment:
     Type: AWS::SSO::Assignment
     DependsOn: ViewOnlyAccessPermissionSet
@@ -71,13 +69,3 @@ Resources:
       PermissionSetArn: !GetAtt ViewOnlyAccessPermissionSet.PermissionSetArn
       PrincipalType: USER
       PrincipalId: c05ca9ec-8011-70d5-3678-cec776a124cc
-
-  # --- Dummy resource to keep template valid during transition ---
-  TemplateAnchor:
-    Type: AWS::CloudFormation::WaitConditionHandle
-
-Outputs:
-  ViewOnlyAccessPermissionSetArn:
-    Value: !GetAtt ViewOnlyAccessPermissionSet.PermissionSetArn
-    Export:
-      Name: ViewOnlyAccessPermissionSetArn
