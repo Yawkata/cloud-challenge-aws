@@ -1,7 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Identity Center Permission Sets + Assignments
+Description: Identity Center stack (dummy resource for deletion)
 
-Resources: {}
+Resources:
+  Dummy:
+    Type: AWS::CloudFormation::WaitConditionHandle
+
   # PowerUserAccessPermissionSet:
   #   Type: AWS::SSO::PermissionSet
   #   Properties:
