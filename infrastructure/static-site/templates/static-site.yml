@@ -1,68 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static Site with S3 and CloudFront (OAC)
-
-Parameters:
-  CertificateArn:
-    Type: String
-    Description: ACM certificate ARN for CloudFront
+Description: Empty S3 bucket stack
 
 Resources:
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: ivanovv-dev-iac
-      AccessControl: Private
-      WebsiteConfiguration:
-        IndexDocument: index.html
 
-  StaticSiteBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref StaticSiteBucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: AllowCloudFrontRead
-            Effect: Allow
-            Principal:
-              Service: cloudfront.amazonaws.com
-            Action: s3:GetObject
-            Resource: !Sub "${StaticSiteBucket.Arn}/*"
-
-  StaticSiteOAC:
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig:
-        Name: ivanovv-dev-iac-oac
-        Description: OAC for static site
-        SigningBehavior: always
-        SigningProtocol: sigv4
-        OriginType: s3
-
-  StaticSiteDistribution:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        DefaultRootObject: index.html
-        Origins:
-          - Id: S3Origin
-            DomainName: !GetAtt StaticSiteBucket.DomainName
-            S3OriginConfig:
-              OriginAccessIdentity: ""
-            OriginAccessControlId: !Ref StaticSiteOAC
-        DefaultCacheBehavior:
-          TargetOriginId: S3Origin
-          ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods:
-            - GET
-            - HEAD
-          CachedMethods:
-            - GET
-            - HEAD
-          Compress: true
-        ViewerCertificate:
-          AcmCertificateArn: !Ref CertificateArn
-          SslSupportMethod: sni-only
-        HttpVersion: http2
-        PriceClass: PriceClass_100
+Outputs:
+  BucketName:
+    Description: "Name of the S3 bucket"
+    Value: !Ref StaticSiteBucket
