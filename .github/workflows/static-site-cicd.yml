@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials via OIDC
@@ -26,42 +26,48 @@ jobs:
           aws-region: eu-north-1
 
       - name: Deploy CloudFormation stack
-        env:
-          BUCKET_NAME: ivanovv-dev-iac
-          CERT_ARN: arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a
-          ALIASES: ivanovv.dev,www.ivanovv.dev
+        id: cfn_deploy
         run: |
-          set -o pipefail
+          STACK_NAME=static-site-stack
+          TEMPLATE_FILE=infrastructure/static-site/templates/static-site.yml
+
           aws cloudformation deploy \
-            --stack-name static-site-stack \
-            --template-file infrastructure/static-site/templates/static-site.yml \
-            --parameter-overrides SiteBucketName=$BUCKET_NAME CertificateArn=$CERT_ARN CloudFrontAliases=$ALIASES \
+            --stack-name $STACK_NAME \
+            --template-file $TEMPLATE_FILE \
             --capabilities CAPABILITY_NAMED_IAM \
-            --debug 2>&1 | tee cf-deploy.log || true
+            --parameter-overrides \
+              SiteBucketName=ivanovv-dev-iac \
+              CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a \
+              CloudFrontAliases="ivanovv.dev,www.ivanovv.dev"
 
-      - name: Show CloudFormation stack events if deploy failed
-        if: failure()
+      - name: Wait for CloudFormation stack to complete
         run: |
-          echo "Deployment failed. Fetching stack events..."
-          aws cloudformation describe-stack-events --stack-name static-site-stack \
-            --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='UPDATE_FAILED']" \
-            --output table
+          STACK_NAME=static-site-stack
+          aws cloudformation wait stack-create-complete --stack-name $STACK_NAME
 
-      - name: Sync site content to S3
-        if: success()
-        env:
-          BUCKET_NAME: ivanovv-dev-iac
+      - name: Get stack outputs (S3 bucket and CloudFront distribution)
+        id: get_outputs
         run: |
-          aws s3 sync site-content/ s3://$BUCKET_NAME/ --delete
-
-      - name: Obtain CloudFront Distribution ID
-        id: getdist
-        run: |
-          STACKNAME=static-site-stack
-          DISTRO_ID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text)
+          STACK_NAME=static-site-stack
+          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='SiteBucketName'].OutputValue" --output text)
+          DISTRO_ID=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text)
+          echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
           echo "distribution_id=$DISTRO_ID" >> $GITHUB_OUTPUT
 
-      - name: Create CloudFront invalidation
-        if: success()
+      - name: Sync site content to S3
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ steps.getdist.outputs.distribution_id }} --paths "/*"
+          aws s3 sync site-content/ s3://${{ steps.get_outputs.outputs.bucket_name }}/ --delete
+
+      - name: Create CloudFront invalidation
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.get_outputs.outputs.distribution_id }} \
+            --paths "/*"
+
+      - name: Debug CloudFormation Failure
+        if: failure()
+        run: |
+          aws cloudformation describe-stack-events \
+            --stack-name static-site-stack \
+            --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='REVIEW_IN_PROGRESS' || ResourceStatus=='ROLLBACK_IN_PROGRESS'].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
+            --output table
