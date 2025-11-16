@@ -1,100 +1,68 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static site - S3 bucket + CloudFront (OAC)
+Description: Static Site with S3 and CloudFront (OAC)
 
 Parameters:
-  SiteBucketName:
-    Type: String
   CertificateArn:
     Type: String
-  CloudFrontAliases:
-    Type: CommaDelimitedList
-  DefaultRootObject:
-    Type: String
-    Default: index.html
+    Description: ACM certificate ARN for CloudFront
 
 Resources:
-
-  SiteBucket:
+  StaticSiteBucket:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
     Properties:
-      BucketName: !Ref SiteBucketName
+      BucketName: ivanovv-dev-iac
       AccessControl: Private
-      VersioningConfiguration:
-        Status: Suspended
+      WebsiteConfiguration:
+        IndexDocument: index.html
 
-  SiteOAC:
+  StaticSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref StaticSiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${StaticSiteBucket.Arn}/*"
+
+  StaticSiteOAC:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: !Sub "${SiteBucketName}-oac"
-        Description: OAC for CloudFront to S3
-        OriginAccessControlOriginType: s3
+        Name: ivanovv-dev-iac-oac
+        Description: OAC for static site
         SigningBehavior: always
         SigningProtocol: sigv4
+        OriginType: s3
 
-  SiteDistribution:
+  StaticSiteDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Enabled: true
-        DefaultRootObject: !Ref DefaultRootObject
-        Aliases: !Ref CloudFrontAliases
-
-        ViewerCertificate:
-          AcmCertificateArn: !Ref CertificateArn
-          SslSupportMethod: sni-only
-          MinimumProtocolVersion: TLSv1.2_2021
-
-        HttpVersion: http2
-        PriceClass: PriceClass_100
-
+        DefaultRootObject: index.html
         Origins:
           - Id: S3Origin
-            DomainName: !GetAtt SiteBucket.RegionalDomainName
-            S3OriginConfig: {}
-            OriginAccessControlId: !Ref SiteOAC
-
+            DomainName: !GetAtt StaticSiteBucket.DomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            OriginAccessControlId: !Ref StaticSiteOAC
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods: [GET, HEAD]
-          CachedMethods: [GET, HEAD]
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
           Compress: true
-
-  SiteBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref SiteBucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: AllowCloudFrontOACRead
-            Effect: Allow
-            Principal: "*"
-            Action:
-              - s3:GetObject
-            Resource: !Sub arn:aws:s3:::${SiteBucket}/*
-            Condition:
-              StringEquals:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}
-
-          - Sid: AllowCloudFrontOACList
-            Effect: Allow
-            Principal: "*"
-            Action: s3:ListBucket
-            Resource: !Sub arn:aws:s3:::${SiteBucket}
-            Condition:
-              StringEquals:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}
-
-Outputs:
-  SiteBucketName:
-    Value: !Ref SiteBucket
-
-  CloudFrontDistributionId:
-    Value: !Ref SiteDistribution
-
-  CloudFrontDomainName:
-    Value: !GetAtt SiteDistribution.DomainName
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+        HttpVersion: http2
+        PriceClass: PriceClass_100

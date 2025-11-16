@@ -1,73 +1,31 @@
-name: Deploy static site (CloudFormation + S3 + CloudFront)
+name: Deploy Static Site
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'infrastructure/static-site/**'
-      - 'site-content/**'
-      - '.github/workflows/static-site-cicd.yml'
-
-permissions:
-  id-token: write
-  contents: read
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
           aws-region: eu-north-1
 
-      - name: Deploy CloudFormation stack
-        id: cfn_deploy
+      - name: Deploy CloudFormation Stack
         run: |
-          STACK_NAME=static-site-stack
-          TEMPLATE_FILE=infrastructure/static-site/templates/static-site.yml
-
           aws cloudformation deploy \
-            --stack-name $STACK_NAME \
-            --template-file $TEMPLATE_FILE \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides \
-              SiteBucketName=ivanovv-dev-iac \
-              CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a \
-              CloudFrontAliases="ivanovv.dev,www.ivanovv.dev"
-
-      - name: Wait for CloudFormation stack to complete
-        run: |
-          STACK_NAME=static-site-stack
-          aws cloudformation wait stack-update-complete --stack-name $STACK_NAME
-
-      - name: Get stack outputs (S3 bucket and CloudFront distribution)
-        id: get_outputs
-        run: |
-          STACK_NAME=static-site-stack
-          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='SiteBucketName'].OutputValue" --output text)
-          DISTRO_ID=$(aws cloudformation describe-stacks --stack-name $STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text)
-          echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
-          echo "distribution_id=$DISTRO_ID" >> $GITHUB_OUTPUT
-
-      - name: Sync site content to S3
-        run: |
-          aws s3 sync site-content/ s3://${{ steps.get_outputs.outputs.bucket_name }}/ --delete
-
-      - name: Create CloudFront invalidation
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ steps.get_outputs.outputs.distribution_id }} \
-            --paths "/*"
-
-      - name: Debug CloudFormation Failure
-        if: failure()
-        run: |
-          aws cloudformation describe-stack-events \
             --stack-name static-site-stack \
-            --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='REVIEW_IN_PROGRESS' || ResourceStatus=='ROLLBACK_IN_PROGRESS'].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
-            --output table
+            --template-file infrastructure/static-site/templates/static-site.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides CertificateArn=arn:aws:acm:eu-north-1:198226511774:certificate/your-cert-id
