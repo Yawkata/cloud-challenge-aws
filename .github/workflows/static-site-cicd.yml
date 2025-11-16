@@ -13,11 +13,10 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Configure AWS credentials from OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::198226511774:policy/GitHubActions-CloudFrontS3-IaC-Policy
           aws-region: eu-north-1
@@ -26,4 +25,4 @@ jobs:
         run: |
           aws cloudformation deploy \
             --stack-name static-site-stack \
-            --template-file cloudformation.yml
+            --template-file infrastructure/static-site/templates/static-site.yml
