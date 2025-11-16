@@ -1,20 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static site - S3 bucket (private) + CloudFront distribution (OAC) + bucket policy
+Description: Static site - S3 bucket + CloudFront (OAC)
 
 Parameters:
   SiteBucketName:
     Type: String
-    Description: Name of the S3 bucket to create (must be globally unique), e.g. ivanovv-dev-iac
   CertificateArn:
     Type: String
-    Description: ACM certificate ARN in us-east-1 that covers your domain (e.g. arn:aws:acm:us-east-1:198226511774:certificate/xxxxxxxx)
   CloudFrontAliases:
     Type: CommaDelimitedList
-    Description: Comma-separated list of domain names (CNAMEs) for CloudFront, e.g. ivanovv.dev,www.ivanovv.dev
   DefaultRootObject:
     Type: String
     Default: index.html
-    Description: Default root object
 
 Resources:
 
@@ -31,7 +27,7 @@ Resources:
     Properties:
       OriginAccessControlConfig:
         Name: !Sub "${SiteBucketName}-oac"
-        Description: OAC for static site to access S3 via SigV4
+        Description: OAC for CloudFront to S3
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
@@ -57,12 +53,8 @@ Resources:
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-          AllowedMethods:
-            - GET
-            - HEAD
-          CachedMethods:
-            - GET
-            - HEAD
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
           Compress: true
 
@@ -73,25 +65,22 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: AllowCloudFrontServicePrincipal
+          - Sid: AllowCloudFrontOAC
             Effect: Allow
             Principal:
               Service: cloudfront.amazonaws.com
             Action: s3:GetObject
             Resource: !Sub arn:aws:s3:::${SiteBucket}/*
             Condition:
-              ArnLike:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}
 
 Outputs:
   SiteBucketName:
-    Description: "S3 bucket name"
     Value: !Ref SiteBucket
 
   CloudFrontDistributionId:
-    Description: "CloudFront distribution id"
     Value: !Ref SiteDistribution
 
   CloudFrontDomainName:
-    Description: "CloudFront domain name"
     Value: !GetAtt SiteDistribution.DomainName
