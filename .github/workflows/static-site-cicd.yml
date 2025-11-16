@@ -1,9 +1,10 @@
-name: Deploy Static Site
+name: Create Empty S3 Bucket
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+    paths:
+      - "infrastructure/static-site/**"
 
 jobs:
   deploy:
@@ -11,21 +12,18 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
+          role-to-assume: arn:aws:iam::198226511774:policy/GitHubActions-CloudFrontS3-IaC-Policy
           aws-region: eu-north-1
 
-      - name: Deploy CloudFormation Stack
+      - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
             --stack-name static-site-stack \
-            --template-file infrastructure/static-site/templates/static-site.yml \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides CertificateArn=arn:aws:acm:eu-north-1:198226511774:certificate/your-cert-id
+            --template-file cloudformation.yml
