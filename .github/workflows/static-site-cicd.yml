@@ -27,4 +27,3 @@ jobs:
           --stack-name static-site-stack \
           --template-file infrastructure/static-site/templates/static-site.yml \
           --no-fail-on-empty-changeset
-
