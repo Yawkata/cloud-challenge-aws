@@ -5,7 +5,7 @@ on:
     branches:
       -main
     paths:
-      - "infrastructure/static-site/templates/**"
+      - "infrastructure/**"
 
 jobs:
   deploy:
