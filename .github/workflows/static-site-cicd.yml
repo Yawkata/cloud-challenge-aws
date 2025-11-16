@@ -31,11 +31,21 @@ jobs:
           CERT_ARN: arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a
           ALIASES: ivanovv.dev,www.ivanovv.dev
         run: |
+          set -o pipefail
           aws cloudformation deploy \
             --stack-name static-site-stack \
             --template-file infrastructure/static-site/templates/static-site.yml \
             --parameter-overrides SiteBucketName=$BUCKET_NAME CertificateArn=$CERT_ARN CloudFrontAliases=$ALIASES \
-            --capabilities CAPABILITY_NAMED_IAM
+            --capabilities CAPABILITY_NAMED_IAM \
+            --debug 2>&1 | tee cf-deploy.log || true
+
+      - name: Show CloudFormation stack events if deploy failed
+        if: failure()
+        run: |
+          echo "Deployment failed. Fetching stack events..."
+          aws cloudformation describe-stack-events --stack-name static-site-stack \
+            --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='UPDATE_FAILED']" \
+            --output table
 
       - name: Sync site content to S3
         if: success()
