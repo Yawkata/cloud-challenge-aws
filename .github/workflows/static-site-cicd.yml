@@ -2,8 +2,9 @@ name: Create Empty S3 Bucket
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+    paths:
+      - "infrastructure/static-site/templates/**"
 
 jobs:
   deploy:
@@ -23,5 +24,7 @@ jobs:
       - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
-            --stack-name static-site-stack \
-            --template-file infrastructure/static-site/templates/static-site.yml
+          --stack-name static-site-stack \
+          --template-file infrastructure/static-site/templates/static-site.yml \
+          --no-fail-on-empty-changeset
+
