@@ -1,0 +1,57 @@
+name: Deploy static site (CloudFormation + S3 + CloudFront)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'infrastructure/static-site/**'
+      - 'site-content/**'
+      - '.github/workflows/static-site-cicd.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
+          aws-region: eu-north-1
+
+      - name: Deploy CloudFormation stack
+        env:
+          BUCKET_NAME: ivanovv-dev-iac
+          CERT_ARN: arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a
+          ALIASES: ivanovv.dev,www.ivanovv.dev
+        run: |
+          aws cloudformation deploy \
+            --stack-name static-site-stack \
+            --template-file infrastructure/static-site/templates/static-site.yml \
+            --parameter-overrides SiteBucketName=$BUCKET_NAME CertificateArn=$CERT_ARN CloudFrontAliases=$ALIASES \
+            --capabilities CAPABILITY_NAMED_IAM
+
+      - name: Sync site content to S3
+        if: success()
+        env:
+          BUCKET_NAME: ivanovv-dev-iac
+        run: |
+          aws s3 sync site-content/ s3://$BUCKET_NAME/ --delete
+
+      - name: Obtain CloudFront Distribution ID
+        id: getdist
+        run: |
+          STACKNAME=static-site-stack
+          DISTRO_ID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text)
+          echo "distribution_id=$DISTRO_ID" >> $GITHUB_OUTPUT
+
+      - name: Create CloudFront invalidation
+        if: success()
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ steps.getdist.outputs.distribution_id }} --paths "/*"
