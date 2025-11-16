@@ -5,7 +5,7 @@ Resources:
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: ivanovv-dev-iacc
+      BucketName: ivanovv-dev-iac
 
 Outputs:
   BucketName:
