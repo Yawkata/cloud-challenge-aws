@@ -16,6 +16,7 @@ Resources:
 
   SiteBucket:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
     Properties:
       BucketName: !Ref SiteBucketName
       AccessControl: Private
@@ -39,17 +40,21 @@ Resources:
         Enabled: true
         DefaultRootObject: !Ref DefaultRootObject
         Aliases: !Ref CloudFrontAliases
+
         ViewerCertificate:
           AcmCertificateArn: !Ref CertificateArn
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
+
         HttpVersion: http2
         PriceClass: PriceClass_100
+
         Origins:
           - Id: S3Origin
             DomainName: !GetAtt SiteBucket.RegionalDomainName
             S3OriginConfig: {}
             OriginAccessControlId: !Ref SiteOAC
+
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
@@ -65,12 +70,21 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: AllowCloudFrontOAC
+          - Sid: AllowCloudFrontOACRead
             Effect: Allow
-            Principal:
-              Service: cloudfront.amazonaws.com
-            Action: s3:GetObject
+            Principal: "*"
+            Action:
+              - s3:GetObject
             Resource: !Sub arn:aws:s3:::${SiteBucket}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}
+
+          - Sid: AllowCloudFrontOACList
+            Effect: Allow
+            Principal: "*"
+            Action: s3:ListBucket
+            Resource: !Sub arn:aws:s3:::${SiteBucket}
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}
