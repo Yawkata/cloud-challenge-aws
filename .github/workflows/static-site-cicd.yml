@@ -3,9 +3,7 @@ name: Create Empty S3 Bucket
 on:
   push:
     branches:
-      -main
-    paths:
-      - "infrastructure/**"
+      - main
 
 jobs:
   deploy:
