@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Portfolio | Yavor</title>
+  </head>
+  <body>
+    <nav>
+      <div class="nav__bar">
+        <a href="#"><span class="logo nav__logo">Y</span> Yavor</a>
+        <div class="nav__menu__btn" id="menu-btn">
+          <i class="ri-menu-3-line"></i>
+        </div>
+      </div>
+      <ul class="nav__links" id="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Tech stack</a></li>
+        <li><a href="#portfolio">Projects</a></li>
+        <li><a href="#contact" class="btn">Contact</a></li>
+      </ul>
+      <a href="#contact" class="btn btn__large">Contact</a>
+    </nav>
+    <header class="section__container header__container" id="home">
+      <div class="header__image">
+        <img src="assets/header.jpg" alt="header" />
+      </div>
+      <div class="header__content">
+        <div>
+          <h1>Yavor Ivanov<br />TUES<br />Student</h1>
+        </div>
+        <p class="section__description">
+          As a dedicated student at Technological School "Electronic Systems," I
+          have developed strong skills in C, C++, Java, Python, Bash, JS and
+          Embedded. I also enjoy being challenged with projects that require me
+          to work outside my comfort and knowledge set. I have interests in web
+          programming, mobile app development, AI technologies and
+          embedded.
+        </p>
+        <div class="header__btn">
+          <button class="btn">Contact Me</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="section__container about__container" id="about">
+      <div class="about__image">
+        <img src="assets/bg.png" alt="bg" class="about__bg-1" />
+        <img src="assets/bg.png" alt="bg" class="about__bg-2" />
+        <img src="assets/about.jpg" alt="about" class="about__img" />
+      </div>
+      <div class="about__content">
+        <h2 class="section__header">About Me</h2>
+        <p class="section__description">
+          Outside of school and programming I enjoy playing football or going for a hike in the nature. 
+          As a system programmer I spend most of my days in front of a computer, which obviously isn’t the healthiest thing. 
+          That’s why I try to minimize the screen time, to give my eyes and my back a rest that they deserve. 
+          I also like playing chess or watching a good movie when I`m not outside. 
+        </p>
+        <div class="about__btn">
+          <a href = "./assets/Yavor_Ivanov_CV.pdf" Download = "Yavor_Ivanov_CV"><button class = "btn"> Download CV</button></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section__container skills__container" id="skills">
+        <div class="skills__data">
+          <h2 class="section__header">My Tech Stack</h2>
+          <p class="skills__description">
+              See fully what skills I have and perform, to develop my projects.
+          </p>
+          <a href="#portfolio" class="btn">See Projects</a>
+        </div>
+        <div class="skills__content">
+          <ol class="skills__group">
+            <li class="skills__item">HTML & CSS</li>
+            <li class="skills__item">JavaScript</li>
+            <li class="skills__item">C & C++</li>
+            <li class="skills__item">Java</li>
+          </ol>
+          <ol class="skills__group" start="5">
+            <li class="skills__item">Bash</li>
+            <li class="skills__item">Git & GitHub</li>
+            <li class="skills__item">Python</li>
+            <li class="skills__item">C#</li>
+          </ol>
+        </div>
+    </section>
+
+    <section class="section__container portfolio__container" id="portfolio">
+      <h2 class="section__header">My Projects</h2>
+      <p class="section__description">
+        Explore a showcase of my diverse projects, demonstrating my skills in
+        embedded, web development and degign, game development and beyond. Each project reflects my passion
+        for creating cool, interesting, impactful and innovative technological experiences.
+      </p>
+      <div class="portfolio__grid">
+        <div class="portfolio__card">
+          <img src="assets/project-1.jpg" alt="portfolio" />
+          <div class="portfolio__modal">
+            <span class="portfolio__subtitle">Embedded</span>
+            <h2 class="portfolio__title">Tilting Maze</h2>
+            <a target=”_blank” href="https://github.com/Filip05-TUES/Hand-Controlled-Tilting-Maze" class="portfolio__button">
+              View demo <i class="ri-external-link-line"></i>
+            </a>
+          </div>
+        </div>
+        <div class="portfolio__card">
+          <img src="assets/project-2.jpg" alt="portfolio" />
+          <div class="portfolio__modal">
+            <span class="portfolio__subtitle">Embedded</span>
+            <h2 class="portfolio__title">Hexapod</h2>
+            <a href="#" class="portfolio__button">
+              View demo <i class="ri-external-link-line"></i>
+            </a>
+          </div>
+        </div>
+        <div class="portfolio__card">
+          <img src="assets/project-3.jpg" alt="portfolio" />
+          <div class="portfolio__modal">
+            <span class="portfolio__subtitle">Embedded</span>
+            <h2 class="portfolio__title">Smart Lamp</h2>
+            <a href="#" class="portfolio__button">
+              View demo <i class="ri-external-link-line"></i>
+            </a>
+          </div>
+        </div>
+        <div class="portfolio__card">
+          <img src="assets/project-4.jpg" alt="portfolio" />
+          <div class="portfolio__modal">
+            <span class="portfolio__subtitle">Web</span>
+            <h2 class="portfolio__title">Memory Cards</h2>
+            <a target=”_blank” href="https://github.com/Yawkata/memory-game" class="portfolio__button">
+              View demo <i class="ri-external-link-line"></i>
+            </a>
+          </div>
+        </div>
+        <div class="portfolio__card">
+          <img src="assets/project-5.jpg" alt="portfolio" />
+          <div class="portfolio__modal">
+            <span class="portfolio__subtitle">IoT</span>
+            <h2 class="portfolio__title">Thermometer Stats</h2>
+            <a href="#" class="portfolio__button">
+              View demo <i class="ri-external-link-line"></i>
+            </a>
+          </div>
+        </div>
+        <div class="portfolio__card">
+          <img src="assets/project-6.jpg" alt="portfolio" />
+          <div class="portfolio__modal">
+            <span class="portfolio__subtitle">Game</span>
+            <h2 class="portfolio__title">2D Game</h2>
+            <a target=”_blank” href="https://github.com/Yawkata/2D-Game" class="portfolio__button">
+              View demo <i class="ri-external-link-line"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="portfolio__banner">
+        <div class="portfolio__banner__card">
+          <span><i class="ri-macbook-line"></i></span>
+          <h4>10+ Projects</h4>
+          <p>Done</p>
+        </div>
+        <div class="portfolio__banner__card">
+          <span><i class="ri-trophy-line"></i></span>
+          <h4>1 Award</h4>
+          <p>Won</p>
+        </div>
+        <div class="portfolio__banner__card">
+          <span><i class="ri-heart-fill"></i></span>
+          <h4>30+ Lovely</h4>
+          <p>Feedbacks</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section__container contact__container" id="contact">
+      <div class="logo">Y</div>
+      <h2 class="section__header">Let's Talk With Me!</h2>
+      <p class="section__description">
+        An open invitation to connect and explore collaborative opportunities
+        on my personal portfolio website.
+      </p>
+      <div class="contact__socials">
+        <a href="https://twitter.com/"><i class="ri-twitter-fill"></i></a>
+        <a href="https://bg.linkedin.com/"><i class="ri-linkedin-fill"></i></a>
+        <a href="https://github.com/Yawkata"><i class="ri-github-fill"></i></a>
+      </div>
+    </section>
+    <footer class="footer">
+      Copyright © 2024. All rights reserved.
+    </footer>
+
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
