@@ -2,7 +2,8 @@ name: Create Empty S3 Bucket
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      -main
     paths:
       - "infrastructure/static-site/templates/**"
 
