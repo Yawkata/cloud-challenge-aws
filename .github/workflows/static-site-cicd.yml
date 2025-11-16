@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - "infrastructure/static-site/**"
+      - "infrastructure/static-site/templates/**"
 
 jobs:
   deploy:
@@ -13,7 +13,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials from OIDC
         uses: aws-actions/configure-aws-credentials@v4
