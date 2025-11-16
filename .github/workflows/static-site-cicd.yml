@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'infrastructure/static-site/templates/static-site.yml'
+      - 'infrastructure/static-site/**'
       - 'site-content/**'
       - '.github/workflows/static-site-cicd.yml'
 
@@ -43,7 +43,7 @@ jobs:
       - name: Wait for CloudFormation stack to complete
         run: |
           STACK_NAME=static-site-stack
-          aws cloudformation wait stack-create-complete --stack-name $STACK_NAME
+          aws cloudformation wait stack-update-complete --stack-name $STACK_NAME
 
       - name: Get stack outputs (S3 bucket and CloudFront distribution)
         id: get_outputs
