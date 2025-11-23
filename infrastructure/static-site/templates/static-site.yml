@@ -15,7 +15,7 @@ Resources:
         Description: OAC for static site
         SigningBehavior: always
         SigningProtocol: sigv4
-        OriginType: s3
+        OriginAccessControlOriginType: s3
 
   StaticSiteDistribution:
     Type: AWS::CloudFront::Distribution
