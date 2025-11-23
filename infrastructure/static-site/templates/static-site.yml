@@ -28,7 +28,7 @@ Resources:
             Resource: !Sub "${StaticSiteBucket.Arn}/*"
             Condition:
               StringEquals:
-              AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteDistribution}"
+              AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${!GetAtt StaticSiteDistribution.Id}"
 
   StaticSiteOAC:
     Type: AWS::CloudFront::OriginAccessControl
