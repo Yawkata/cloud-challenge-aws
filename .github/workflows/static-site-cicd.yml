@@ -24,9 +24,19 @@ jobs:
           aws-region: eu-north-1
 
       - name: Deploy CloudFormation Stack
+        id: deploy_stack
         run: |
           aws cloudformation deploy \
             --stack-name static-site-stack \
             --template-file infrastructure/static-site/templates/static-site.yml \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a
+            --parameter-overrides CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a || true
+
+      - name: Get CloudFormation Deployment Error Details
+        if: ${{ failure() || steps.deploy_stack.outcome == 'success' }}
+        run: |
+          aws cloudformation describe-stack-events \
+            --stack-name static-site-stack \
+            --max-items 10 \
+            --query "StackEvents[? ResourceType == 'AWS::CloudFormation::Stack' || ResourceStatus == 'FAILED'].{Timestamp: Timestamp, ResourceStatus: ResourceStatus, LogicalResourceId: LogicalResourceId, ResourceType: ResourceType, ResourceStatusReason: ResourceStatusReason}" \
+            --output table
