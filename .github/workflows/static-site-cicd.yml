@@ -29,4 +29,4 @@ jobs:
             --stack-name static-site-stack \
             --template-file infrastructure/static-site/templates/static-site.yml \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a
+            --parameter-overrides "CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a"
