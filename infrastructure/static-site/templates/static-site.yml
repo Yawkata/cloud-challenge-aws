@@ -56,7 +56,4 @@ Resources:
             Resource: !Sub "${StaticSiteBucket.Arn}/*"
             Condition:
               StringEquals:
-                AWS:SourceArn:
-                  !Join [ "",
-                    [ "arn:aws:cloudfront::", !Ref "AWS::AccountId", ":distribution/", !GetAtt StaticSiteDistribution.Id ]
-                  ]
+                "AWS:SourceArn": !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteDistribution}"
