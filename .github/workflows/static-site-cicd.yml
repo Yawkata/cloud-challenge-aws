@@ -35,8 +35,8 @@ jobs:
       - name: Get CloudFormation Deployment Error Details
         if: ${{ failure() || steps.deploy_stack.outcome == 'success' }}
         run: |
-          aws cloudformation describe-stack-events \
+          aws cloudformation describe-change-set \
             --stack-name static-site-stack \
-            --max-items 10 \
-            --query "StackEvents[? ResourceType == 'AWS::CloudFormation::Stack' || ResourceStatus == 'FAILED'].{Timestamp: Timestamp, ResourceStatus: ResourceStatus, LogicalResourceId: LogicalResourceId, ResourceType: ResourceType, ResourceStatusReason: ResourceStatusReason}" \
-            --output table
+            --change-set-name $(aws cloudformation list-change-sets --stack-name static-site-stack --query "Summaries[?Status == 'FAILED'].ChangeSetId" --output text) \
+            --query "StatusReason" \
+            --output text
