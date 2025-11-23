@@ -12,8 +12,6 @@ Resources:
     Properties:
       BucketName: ivanovv-dev-iac
       AccessControl: Private
-      WebsiteConfiguration:
-        IndexDocument: index.html
 
   StaticSiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
