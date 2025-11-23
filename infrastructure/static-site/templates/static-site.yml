@@ -53,7 +53,7 @@ Resources:
             OriginAccessControlId: !Ref StaticSiteOAC
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
-          ViewerProtocolPolicy: redirect-to-https
+          ViewerProtocolPolicy: allow-all
           AllowedMethods:
             - GET
             - HEAD
@@ -61,11 +61,5 @@ Resources:
             - GET
             - HEAD
           Compress: true
-        Aliases: 
-          - ivanovv.dev
-          - www.ivanovv.dev
-        ViewerCertificate:
-          AcmCertificateArn: !Ref CertificateArn
-          SslSupportMethod: sni-only
         HttpVersion: http2
         PriceClass: PriceClass_100
