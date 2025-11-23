@@ -1,4 +1,4 @@
-name: Create Empty S3 Bucket
+name: Deploy Static Site
 
 on:
   push:
@@ -12,21 +12,21 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials from OIDC
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
           aws-region: eu-north-1
-          
-      - name: Validate template
-        run: |
-          aws cloudformation validate-template --template-body file://infrastructure/static-site/templates/static-site.yml
 
-      - name: Deploy CloudFormation stack
+      - name: Deploy CloudFormation Stack
         run: |
           aws cloudformation deploy \
             --stack-name static-site-stack \
-            --template-file infrastructure/static-site/templates/static-site.yml
+            --template-file infrastructure/static-site/templates/static-site.yml \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a
