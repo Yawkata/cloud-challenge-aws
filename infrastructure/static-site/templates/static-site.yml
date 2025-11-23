@@ -15,6 +15,7 @@ Resources:
 
   StaticSiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
+    DependsOn: StaticSiteDistribution 
     Properties:
       Bucket: !Ref StaticSiteBucket
       PolicyDocument:
@@ -28,7 +29,7 @@ Resources:
             Resource: !Sub "${StaticSiteBucket.Arn}/*"
             Condition:
               StringEquals:
-              AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteDistribution.Id}"
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteDistribution.Id}"
 
   StaticSiteOAC:
     Type: AWS::CloudFront::OriginAccessControl
