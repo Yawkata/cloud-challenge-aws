@@ -7,36 +7,22 @@ Resources:
     Properties:
       BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}" 
 
-  StaticSiteOAC:
-    Type: AWS::CloudFront::OriginAccessControl
+  StaticSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
     Properties:
-      OriginAccessControlConfig:
-        Name: ivanovv-dev-iac-oac
-        Description: OAC for static site
-        SigningBehavior: always
-        SigningProtocol: sigv4
-        OriginType: s3
-
-  StaticSiteDistribution:
-    Type: AWS::CloudFront::Distribution
-    DependsOn: StaticSiteBucket
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        DefaultRootObject: index.html
-        Origins:
-          - Id: S3Origin
-            DomainName: !GetAtt StaticSiteBucket.DomainName
-            OriginAccessControlId: !Ref StaticSiteOAC
-        DefaultCacheBehavior:
-          TargetOriginId: S3Origin
-          ViewerProtocolPolicy: allow-all
-          AllowedMethods:
-            - GET
-            - HEAD
-          CachedMethods:
-            - GET
-            - HEAD
-          Compress: true
-        HttpVersion: http2
-        PriceClass: PriceClass_100
+      Bucket: !Ref StaticSiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${StaticSiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn:
+                  !Join [ "",
+                    [ "arn:aws:cloudfront::", !Ref "AWS::AccountId", ":distribution/", !GetAtt StaticSiteDistribution.Id ]
+                  ]
