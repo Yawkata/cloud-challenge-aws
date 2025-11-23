@@ -6,7 +6,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}" 
-      AccessControl: Private
 
   StaticSiteOAC:
     Type: AWS::CloudFront::OriginAccessControl
@@ -38,6 +37,7 @@ Resources:
 
   StaticSiteDistribution:
     Type: AWS::CloudFront::Distribution
+    DependsOn: StaticSiteBucket
     Properties:
       DistributionConfig:
         Enabled: true
