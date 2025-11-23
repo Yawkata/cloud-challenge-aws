@@ -26,6 +26,9 @@ Resources:
               Service: cloudfront.amazonaws.com
             Action: s3:GetObject
             Resource: !Sub "${StaticSiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+              AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteDistribution}"
 
   StaticSiteOAC:
     Type: AWS::CloudFront::OriginAccessControl
