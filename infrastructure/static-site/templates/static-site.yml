@@ -5,4 +5,38 @@ Resources:
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}"
+      BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}" 
+
+  StaticSiteOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: ivanovv-dev-iac-oac
+        Description: OAC for static site
+        SigningBehavior: always
+        SigningProtocol: sigv4
+        OriginType: s3
+
+  StaticSiteDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn: StaticSiteBucket
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt StaticSiteBucket.DomainName
+            OriginAccessControlId: !Ref StaticSiteOAC
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: allow-all
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          Compress: true
+        HttpVersion: http2
+        PriceClass: PriceClass_100
