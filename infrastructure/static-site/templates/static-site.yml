@@ -10,7 +10,7 @@ Resources:
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: ivanovv-dev-iac
+      BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}"
       AccessControl: Private
 
   StaticSiteOAC:
