@@ -1,10 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Static Site with S3 and CloudFront OAC
-
-Parameters:
-  CertificateArn:
-    Type: String
-    Description: ACM certificate ARN for CloudFront
     
 Resources:
   StaticSiteBucket:
