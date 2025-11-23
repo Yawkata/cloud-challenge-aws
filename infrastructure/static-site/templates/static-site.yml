@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Static Site with S3 and CloudFront (OAC)
+Description: Static Site with S3 and CloudFront + OAC
 
 Parameters:
   CertificateArn:
