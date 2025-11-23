@@ -5,13 +5,23 @@ Parameters:
   CertificateArn:
     Type: String
     Description: ACM certificate ARN for CloudFront
-
+    
 Resources:
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: ivanovv-dev-iac
       AccessControl: Private
+
+  StaticSiteOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: ivanovv-dev-iac-oac
+        Description: OAC for static site
+        SigningBehavior: always
+        SigningProtocol: sigv4
+        OriginType: s3
 
   StaticSiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -30,16 +40,6 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteDistribution.Id}"
-
-  StaticSiteOAC:
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig:
-        Name: ivanovv-dev-iac-oac
-        Description: OAC for static site
-        SigningBehavior: always
-        SigningProtocol: sigv4
-        OriginType: s3
 
   StaticSiteDistribution:
     Type: AWS::CloudFront::Distribution
@@ -61,6 +61,9 @@ Resources:
             - GET
             - HEAD
           Compress: true
+        Aliases: 
+          - ivanovv.dev
+          - www.ivanovv.dev
         ViewerCertificate:
           AcmCertificateArn: !Ref CertificateArn
           SslSupportMethod: sni-only
