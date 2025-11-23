@@ -23,19 +23,10 @@ jobs:
           role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
           aws-region: eu-north-1
 
-      - name: Deploy CloudFormation Stack
-        id: deploy_stack
+      - name: Deploy CloudFormation Stack 🚀
         run: |
           aws cloudformation deploy \
             --stack-name static-site-stack \
             --template-file infrastructure/static-site/templates/static-site.yml \
-            --capabilities CAPABILITY_IAM
-
-      - name: Get CloudFormation Deployment Error Details
-        if: ${{ failure() || steps.deploy_stack.outcome == 'success' }}
-        run: |
-          aws cloudformation describe-change-set \
-            --stack-name static-site-stack \
-            --change-set-name $(aws cloudformation list-change-sets --stack-name static-site-stack --query "Summaries[?Status == 'FAILED'].ChangeSetId" --output text) \
-            --query "StatusReason" \
-            --output text
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a
