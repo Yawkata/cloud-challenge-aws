@@ -72,3 +72,10 @@ Resources:
             Condition:
               StringEquals:
                 "AWS:SourceArn": !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${StaticSiteDistribution}"
+
+Outputs:
+  StaticSiteBucketName:
+    Description: Name of the S3 bucket hosting the static website
+    Value: !Ref StaticSiteBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketName"
