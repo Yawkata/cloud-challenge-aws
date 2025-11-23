@@ -10,7 +10,7 @@ Resources:
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}"
+      BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}" 
       AccessControl: Private
 
   StaticSiteOAC:
@@ -53,7 +53,7 @@ Resources:
             OriginAccessControlId: !Ref StaticSiteOAC
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
-          ViewerProtocolPolicy: allow-all
+          ViewerProtocolPolicy: redirect-to-https
           AllowedMethods:
             - GET
             - HEAD
