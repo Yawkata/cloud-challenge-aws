@@ -48,8 +48,6 @@ Resources:
         Origins:
           - Id: S3Origin
             DomainName: !GetAtt StaticSiteBucket.DomainName
-            S3OriginConfig:
-              OriginAccessIdentity: {}
             OriginAccessControlId: !Ref StaticSiteOAC
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
