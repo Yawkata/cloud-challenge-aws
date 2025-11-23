@@ -11,7 +11,7 @@ Resources:
   StaticSiteBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "ivanovv-dev-iac-${AWS::StackName}" 
+      BucketName: !Sub "ivanovv-dev-iac" 
 
   StaticSiteOAC:
     Type: AWS::CloudFront::OriginAccessControl
