@@ -79,3 +79,9 @@ Outputs:
     Value: !Ref StaticSiteBucket
     Export:
       Name: !Sub "${AWS::StackName}-BucketName"
+
+  StaticSiteDistributionId:
+    Description: ID of the CloudFront Distribution
+    Value: !Ref StaticSiteDistribution
+    Export:
+      Name: !Sub "${AWS::StackName}-DistributionId"
