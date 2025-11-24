@@ -57,29 +57,28 @@ jobs:
             --paths "/*"
           
           echo "CloudFront invalidation request sent for $DISTRIBUTION_ID."
-
-
-    test:
-      name: Smoke Test Deployment
-      runs-on: ubuntu-latest
-      needs: deploy_content
+          
+  test:
+    name: Smoke Test Deployment
+    runs-on: ubuntu-latest
+    needs: deploy_content
       
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Setup Node.js
-          uses: actions/setup-node@v4
-          with:
-            node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-        - name: Install dependencies (Cypress)
-          run: npm install
+      - name: Install dependencies (Cypress)
+        run: npm install
 
-        - name: Run Cypress Tests
-          uses: cypress-io/github-action@v6
-          with:
-            command: npm run cypress:run 
-            wait-on: https://ivanovv.dev
-          env:
-            CYPRESS_BASE_URL: https://ivanovv.dev
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run cypress:run 
+          wait-on: https://ivanovv.dev
+        env:
+          CYPRESS_BASE_URL: https://ivanovv.dev
