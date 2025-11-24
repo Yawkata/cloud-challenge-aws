@@ -21,7 +21,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
+          role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsContentDeployRole
           aws-region: eu-north-1
 
       - name: Upload Static Website Files to S3
