@@ -5,8 +5,12 @@ on:
     branches: [ main ]
     paths:
       - "site-content/**"
-      - "package.json"
+
       - "cypress/**"
+      - "package.json"
+      - "package-lock.json"
+      - "cypress.config.js"
+      
       - ".github/workflows/static-site-content.yml"
 
 jobs:
@@ -57,7 +61,7 @@ jobs:
             --paths "/*"
           
           echo "CloudFront invalidation request sent for $DISTRIBUTION_ID."
-          
+
   test:
     name: Smoke Test Deployment
     runs-on: ubuntu-latest
