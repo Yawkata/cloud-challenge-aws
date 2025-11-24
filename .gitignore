@@ -1,0 +1,25 @@
+# -----------------------------
+# Node.js / NPM Dependencies
+# -----------------------------
+/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# -----------------------------
+# Cypress Files
+# -----------------------------
+/cypress/videos/
+/cypress/screenshots/
+/cypress/results/
+
+# -----------------------------
+# Local IDE and OS Files
+# -----------------------------
+.DS_Store
+.vscode/
+
+# -----------------------------
+# AWS / Infrastructure Artifacts
+# -----------------------------
+/infrastructure/static-site/templates/*.json.out
