@@ -1,0 +1,57 @@
+name: Deploy Static Content (S3/CloudFront)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "site-content/**"
+      - ".github/workflows/deploy-content.yml"
+
+jobs:
+  deploy_content:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
+          aws-region: eu-north-1
+
+      - name: Upload Static Website Files to S3
+        run: |
+          # 1. Fetch the actual bucket name from the deployed stack outputs
+          BUCKET_NAME=$(aws cloudformation describe-stacks \
+            --stack-name static-site-stack \
+            --query "Stacks[0].Outputs[?OutputKey=='StaticSiteBucketName'].OutputValue" \
+            --output text)
+
+          # 2. Use aws s3 sync to upload files
+          aws s3 sync ./site-content s3://$BUCKET_NAME \
+            --delete \
+            --acl private \
+            --exclude "infrastructure/*" 
+            
+          echo "Successfully synced files to s3://$BUCKET_NAME"
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          echo "Fetching CloudFront Distribution ID..."
+          # 1. Fetch the Distribution ID from the deployed stack outputs
+          DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
+            --stack-name static-site-stack \
+            --query "Stacks[0].Outputs[?OutputKey=='StaticSiteDistributionId'].OutputValue" \
+            --output text)
+
+          # 2. Create the invalidation request for all paths
+          aws cloudfront create-invalidation \
+            --distribution-id $DISTRIBUTION_ID \
+            --paths "/*"
+          
+          echo "CloudFront invalidation request sent for $DISTRIBUTION_ID."
