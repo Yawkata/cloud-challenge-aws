@@ -32,7 +32,7 @@ Resources:
         DefaultRootObject: index.html
         Origins:
           - Id: S3Origin
-            DomainName: !GetAtt StaticSiteBucket.DomainName
+            DomainName: !Sub "${StaticSiteBucket}.s3.${AWS::Region}.amazonaws.com"
             OriginAccessControlId: !Ref StaticSiteOAC
             S3OriginConfig: {}
         DefaultCacheBehavior:
