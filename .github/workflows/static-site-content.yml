@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
       - "site-content/**"
-      - ".github/workflows/deploy-content.yml"
+      - ".github/workflows/static-site-content.yml"
 
 jobs:
   deploy_content:
