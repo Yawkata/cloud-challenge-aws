@@ -1,11 +1,11 @@
-name: Deploy Static Site
+name: Deploy Infrastructure Stack (CloudFormation)
 
 on:
   push:
     branches: [ main ]
     paths:
       - "infrastructure/static-site/templates/**"
-      - ".github/workflows/static-site-cicd.yml"
+      - ".github/workflows/static-site-stack.yml"
 
 jobs:
   deploy:
@@ -45,19 +45,3 @@ jobs:
             --stack-name static-site-stack \
             --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='REVIEW_IN_PROGRESS' || ResourceStatus=='ROLLBACK_IN_PROGRESS'].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
             --output table
-      
-      - name: Upload Static Website Files to S3
-        run: |
-          # 1. Fetch the actual bucket name from the deployed stack outputs
-          BUCKET_NAME=$(aws cloudformation describe-stacks \
-            --stack-name static-site-stack \
-            --query "Stacks[0].Outputs[?OutputKey=='StaticSiteBucketName'].OutputValue" \
-            --output text)
-
-          # 2. Use aws s3 sync to upload files
-          aws s3 sync ./site-content s3://$BUCKET_NAME \
-            --delete \
-            --acl private \
-            --exclude "infrastructure/*" 
-            
-          echo "Successfully synced files to s3://$BUCKET_NAME"
