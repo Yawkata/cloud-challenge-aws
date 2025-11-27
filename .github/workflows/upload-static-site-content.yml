@@ -4,14 +4,14 @@ on:
   push:
     branches: [ main ]
     paths:
-      - "site-content/**"
+      - "web/**"
 
       - "cypress/**"
       - "package.json"
       - "package-lock.json"
       - "cypress.config.js"
 
-      - ".github/workflows/static-site-content.yml"
+      - ".github/workflows/upload-static-site-content.yml"
 
 jobs:
   deploy_content:
@@ -39,10 +39,10 @@ jobs:
             --output text)
 
           # 2. Use aws s3 sync to upload files
-          aws s3 sync ./site-content s3://$BUCKET_NAME \
+          aws s3 sync ./web s3://$BUCKET_NAME \
             --delete \
             --acl private \
-            --exclude "infrastructure/*" 
+            --exclude "infra/*" 
             
           echo "Successfully synced files to s3://$BUCKET_NAME"
 
