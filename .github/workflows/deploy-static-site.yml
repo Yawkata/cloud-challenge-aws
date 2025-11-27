@@ -4,8 +4,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - "infrastructure/static-site/templates/**"
-      - ".github/workflows/static-site-stack.yml"
+      - "infra/static-site/**"
+      - ".github/workflows/deploy-static-site.yml"
 
 jobs:
   deploy:
@@ -27,13 +27,13 @@ jobs:
       - name: Validate Template Syntax
         run: |
           aws cloudformation validate-template \
-            --template-body file://infrastructure/static-site/templates/static-site.yml
+            --template-body file://infra/static-site/static-site-stack.yml
 
       - name: Deploy CloudFormation Stack
         run: |
           aws cloudformation deploy \
             --stack-name static-site-stack \
-            --template-file infrastructure/static-site/templates/static-site.yml \
+            --template-file infra/static-site/static-site-stack.yml \
             --capabilities CAPABILITY_IAM \
             --parameter-overrides "CertificateArn=arn:aws:acm:us-east-1:198226511774:certificate/54982cfd-b1c8-47b3-8ffe-48c720584e0a" \
             --no-fail-on-empty-changeset

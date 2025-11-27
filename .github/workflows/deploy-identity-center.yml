@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - "infrastructure/identity-center/**"
+      - "infra/identity-center/**"
 
 jobs:
   deploy-identity-center:
@@ -24,7 +24,7 @@ jobs:
       - name: Deploy Identity Center Stack
         run: |
           aws cloudformation deploy \
-            --template-file infrastructure/identity-center/identity-center-stack.yml \
+            --template-file infra/identity-center/identity-center-stack.yml \
             --stack-name identity-center \
             --capabilities CAPABILITY_NAMED_IAM
 

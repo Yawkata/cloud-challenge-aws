@@ -22,4 +22,4 @@ yarn-error.log*
 # -----------------------------
 # AWS / Infrastructure Artifacts
 # -----------------------------
-/infrastructure/static-site/templates/*.json.out
+/infra/static-site/*.json.out
