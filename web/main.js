@@ -2,6 +2,7 @@ import { incrementVisitorCount } from "./api.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const newCount = await incrementVisitorCount();
+    console.log("API returned:", data);
     document.getElementById("visitor-count").innerText = newCount;
 });
 
