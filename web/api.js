@@ -11,5 +11,5 @@ export async function incrementVisitorCount() {
         method: "POST"
     });
     const data = await response.json();
-    return data.new_count;
+    return data.visitor_count;
 }
