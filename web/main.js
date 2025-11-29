@@ -1,3 +1,10 @@
+import { incrementVisitorCount } from "./api.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const newCount = await incrementVisitorCount();
+    document.getElementById("visitor-count").innerText = newCount;
+});
+
 const navLinks = document.getElementById("nav-links");
 const menuBtn = document.getElementById("menu-btn");
 const menuBtnIcon = menuBtn.querySelector("i");

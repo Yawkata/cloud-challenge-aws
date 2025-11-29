@@ -356,7 +356,7 @@ nav {
   box-shadow: 5px 5px 10px rgba(28, 27, 27, 0.2);
 }
 
-.portfolio__banner__card span {
+.portfolio__banner__card > span:first-child {
   display: inline-block;
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
