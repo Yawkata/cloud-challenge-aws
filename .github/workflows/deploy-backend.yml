@@ -29,5 +29,5 @@ jobs:
         run: |
           aws cloudformation deploy \
             --stack-name artifacts-bucket-stack \
-            --template-file infrastructure/backend/artifacts-bucket.yml \
+            --template-file infra/backend/artifacts-bucket.yml \
             --capabilities CAPABILITY_NAMED_IAM
