@@ -1,12 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Backend Lambda stack"
 
-Parameters:
-  ArtifactBucketName:
-    Type: String
-  ArtifactKey:
-    Type: String
-
 Resources:
   VisitorCounterLambdaRole:
     Type: AWS::IAM::Role
@@ -31,12 +25,6 @@ Resources:
       Runtime: python3.11
       Timeout: 10
       Role: !GetAtt VisitorCounterLambdaRole.Arn
-      Code:
-        S3Bucket: !Ref ArtifactBucketName
-        S3Key: !Ref ArtifactKey
-
-Outputs:
-  LambdaArn:
-    Value: !GetAtt VisitorCounterLambdaIAC.Arn
-    Export:
-      Name: VisitorCounterLambdaArn
+      Code: 
+        S3Bucket: ""
+        S3Key: ""

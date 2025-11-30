@@ -25,47 +25,27 @@ jobs:
           role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
           aws-region: eu-north-1
 
-      - name: Deploy artifacts bucket stack
+      - name: Deploy artifacts bucket
         run: |
           aws cloudformation deploy \
-            --stack-name artifacts-stack \
-            --template-file infra/backend/artifacts-bucket.yml \
-            --capabilities CAPABILITY_NAMED_IAM
+            --template-file infra/artifacts-bucket.yml \
+            --stack-name artifacts-bucket
 
-      - name: Get bucket name from exports
-        id: bucket
+      - name: Package backend template
         run: |
-          BUCKET=$(aws cloudformation list-exports \
-            --query "Exports[?Name=='ArtifactsBucketName'].Value" \
-            --output text)
-          
-          if [ -z "$BUCKET" ]; then
-            echo "Bucket export not found!"
-            exit 1
-          fi
-
-          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
-          echo "Using bucket: $BUCKET"
-
-      - name: Zip Lambda function
-        run: |
-          cd backend/visitor-counter
-          zip -r ../../visitor-counter.zip .
-
-      - name: Upload Lambda package
-        run: |
-          aws s3 cp visitor-counter.zip \
-            s3://${{ steps.bucket.outputs.bucket }}/visitor-counter.zip
+          aws cloudformation package \
+            --template-file infra/backend-stack.yml \
+            --s3-bucket $(aws cloudformation list-exports \
+               --query "Exports[?Name=='ArtifactsBucketName'].Value" \
+               --output text) \
+            --output-template-file packaged-backend.yml
 
       - name: Deploy backend stack
         run: |
           aws cloudformation deploy \
+            --template-file packaged-backend.yml \
             --stack-name backend-stack \
-            --template-file infra/backend/backend-stack.yml \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides \
-              ArtifactBucketName=${{ steps.bucket.outputs.bucket }} \
-              ArtifactKey=visitor-counter.zip
+            --capabilities CAPABILITY_NAMED_IAM
 
       - name: Debug CloudFormation Failure
         if: failure()
