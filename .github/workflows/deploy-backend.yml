@@ -28,13 +28,13 @@ jobs:
       - name: Deploy artifacts bucket
         run: |
           aws cloudformation deploy \
-            --template-file infra/artifacts-bucket.yml \
+            --template-file infra/backend/artifacts-bucket.yml \
             --stack-name artifacts-bucket
 
       - name: Package backend template
         run: |
           aws cloudformation package \
-            --template-file infra/backend-stack.yml \
+            --template-file infra/backend/backend-stack.yml \
             --s3-bucket $(aws cloudformation list-exports \
                --query "Exports[?Name=='ArtifactsBucketName'].Value" \
                --output text) \

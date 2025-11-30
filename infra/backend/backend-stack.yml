@@ -25,6 +25,4 @@ Resources:
       Runtime: python3.11
       Timeout: 10
       Role: !GetAtt VisitorCounterLambdaRole.Arn
-      Code: 
-        S3Bucket: ""
-        S3Key: ""
+      CodeUri: ../../backend/visitor-counter
