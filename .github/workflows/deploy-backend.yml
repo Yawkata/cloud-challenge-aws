@@ -25,27 +25,40 @@ jobs:
           role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
           aws-region: eu-north-1
 
-      - name: Package Lambda
+      - name: Deploy artifacts bucket stack
+        run: |
+          aws cloudformation deploy \
+            --stack-name artifacts-stack \
+            --template-file infra/backend/artifacts-bucket.yml \
+            --capabilities CAPABILITY_NAMED_IAM
+
+      - name: Get artifact bucket name
+        id: bucket
+        run: |
+          echo "bucket=$(aws cloudformation describe-stacks \
+            --stack-name artifacts-stack \
+            --query "Stacks[0].Outputs[?OutputKey=='ArtifactBucketName'].OutputValue" \
+            --output text)" >> $GITHUB_OUTPUT
+
+      - name: Zip Lambda function
         run: |
           cd backend/visitor-counter
           zip -r ../../visitor-counter.zip .
 
-      - name: Deploy Backend Stack
+      - name: Upload Lambda package
         run: |
-          # Deploy CloudFormation stack
+          aws s3 cp visitor-counter.zip \
+            s3://${{ steps.bucket.outputs.bucket }}/visitor-counter.zip
+
+      - name: Deploy backend stack
+        run: |
           aws cloudformation deploy \
             --stack-name backend-stack \
             --template-file infra/backend/backend-stack.yml \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides LambdaArtifactKey=visitor-counter.zip
-
-      - name: Upload Lambda artifact
-        run: |
-          BUCKET_NAME=$(aws cloudformation describe-stacks \
-            --stack-name backend-stack \
-            --query "Stacks[0].Outputs[?OutputKey=='ArtifactsBucketName'].OutputValue" \
-            --output text)
-          aws s3 cp visitor-counter.zip s3://$BUCKET_NAME/visitor-counter.zip
+            --parameter-overrides \
+              ArtifactBucketName=${{ steps.bucket.outputs.bucket }} \
+              ArtifactKey=visitor-counter.zip
 
       - name: Debug CloudFormation Failure
         if: failure()
