@@ -23,10 +23,10 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-  VisitorCounterLambda:
+  VisitorCounterLambdaIAC:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: "VisitorCounterLambda"
+      FunctionName: "VisitorCounterLambdaIAC"
       Handler: app.lambda_handler
       Runtime: python3.11
       Timeout: 10
@@ -37,6 +37,6 @@ Resources:
 
 Outputs:
   LambdaArn:
-    Value: !GetAtt VisitorCounterLambda.Arn
+    Value: !GetAtt VisitorCounterLambdaIAC.Arn
     Export:
       Name: VisitorCounterLambdaArn
