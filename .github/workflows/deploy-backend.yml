@@ -25,12 +25,27 @@ jobs:
           role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
           aws-region: eu-north-1
 
-      - name: Deploy artifacts bucket
+      - name: Package Lambda
         run: |
+          cd backend/visitor-counter
+          zip -r ../../visitor-counter.zip .
+
+      - name: Deploy Backend Stack
+        run: |
+          # Deploy CloudFormation stack
           aws cloudformation deploy \
-            --stack-name artifacts-bucket-stack \
-            --template-file infra/backend/artifacts-bucket.yml \
-            --capabilities CAPABILITY_NAMED_IAM
+            --stack-name backend-stack \
+            --template-file infra/backend/backend-stack.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides LambdaArtifactKey=visitor-counter.zip
+
+      - name: Upload Lambda artifact
+        run: |
+          BUCKET_NAME=$(aws cloudformation describe-stacks \
+            --stack-name backend-stack \
+            --query "Stacks[0].Outputs[?OutputKey=='ArtifactsBucketName'].OutputValue" \
+            --output text)
+          aws s3 cp visitor-counter.zip s3://$BUCKET_NAME/visitor-counter.zip
 
       - name: Debug CloudFormation Failure
         if: failure()

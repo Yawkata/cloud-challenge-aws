@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Minimal backend stack: S3 bucket for Lambda artifacts + Lambda function
+
+Parameters:
+  LambdaArtifactKey:
+    Type: String
+    Default: visitor-counter.zip
+    Description: S3 key for the Lambda zip
+
+Resources:
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "visitor-counter-artifacts-${AWS::AccountId}"
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "visitor-counter-lambda-role-${AWS::AccountId}"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  VisitorCounterLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: visitor-counter
+      Handler: app.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.14
+      Code:
+        S3Bucket: !Ref ArtifactsBucket
+        S3Key: !Ref LambdaArtifactKey
+
+Outputs:
+  LambdaFunctionName:
+    Value: !Ref VisitorCounterLambda
+  ArtifactsBucketName:
+    Value: !Ref ArtifactsBucket
