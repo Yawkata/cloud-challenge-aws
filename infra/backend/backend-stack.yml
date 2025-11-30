@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Minimal backend stack: S3 bucket for Lambda artifacts + Lambda function
+Description: S3 bucket for Lambda artifacts + Lambda function
 
 Parameters:
   LambdaArtifactKey:
