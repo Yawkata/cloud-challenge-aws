@@ -5,10 +5,10 @@ Resources:
   ArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-app-artifacts
+      BucketName: my-app-artifacts-198226511774
       VersioningConfiguration:
         Status: Enabled
 
 Outputs:
   ArtifactsBucketName:
-    Value: my-app-artifacts
+    Value: my-app-artifacts-198226511774
