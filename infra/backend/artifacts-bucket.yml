@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Bucket for storing Lambda & CloudFormation artifacts
+
+Resources:
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-app-artifacts
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+  ArtifactsBucketName:
+    Value: my-app-artifacts

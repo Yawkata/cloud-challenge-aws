@@ -1,0 +1,33 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "infra/backend/**"
+      - ".github/workflows/deploy-backend.yml"
+
+jobs:
+  deploy-artifacts-bucket:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsDeployRole
+          aws-region: eu-north-1
+
+      - name: Deploy artifacts bucket
+        run: |
+          aws cloudformation deploy \
+            --stack-name artifacts-bucket-stack \
+            --template-file infrastructure/backend/artifacts-bucket.yml \
+            --capabilities CAPABILITY_NAMED_IAM
