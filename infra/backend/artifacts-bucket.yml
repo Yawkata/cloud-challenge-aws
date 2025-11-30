@@ -5,10 +5,12 @@ Resources:
   ArtifactsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-app-artifacts-198226511774
+      BucketName: !Sub "visitor-counter-artifacts-${AWS::AccountId}"
       VersioningConfiguration:
         Status: Enabled
 
 Outputs:
   ArtifactsBucketName:
-    Value: my-app-artifacts-198226511774
+    Value: !Ref ArtifactsBucket
+    Export:
+      Name: "ArtifactsBucketName"

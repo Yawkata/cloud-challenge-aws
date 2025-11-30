@@ -32,13 +32,20 @@ jobs:
             --template-file infra/backend/artifacts-bucket.yml \
             --capabilities CAPABILITY_NAMED_IAM
 
-      - name: Get artifact bucket name
+      - name: Get bucket name from exports
         id: bucket
         run: |
-          echo "bucket=$(aws cloudformation describe-stacks \
-            --stack-name artifacts-stack \
-            --query "Stacks[0].Outputs[?OutputKey=='ArtifactBucketName'].OutputValue" \
-            --output text)" >> $GITHUB_OUTPUT
+          BUCKET=$(aws cloudformation list-exports \
+            --query "Exports[?Name=='ArtifactsBucketName'].Value" \
+            --output text)
+          
+          if [ -z "$BUCKET" ]; then
+            echo "Bucket export not found!"
+            exit 1
+          fi
+
+          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+          echo "Using bucket: $BUCKET"
 
       - name: Zip Lambda function
         run: |
