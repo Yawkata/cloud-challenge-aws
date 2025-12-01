@@ -27,7 +27,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: "VisitorCounterLambdaIAC"
-      Handler: app.lambda_handler
+      Handler: visitor_counter.lambda_handler
       Runtime: python3.11
       Timeout: 10
       Role: !GetAtt VisitorCounterLambdaRole.Arn

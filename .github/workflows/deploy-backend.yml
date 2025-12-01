@@ -8,7 +8,7 @@ on:
       - ".github/workflows/deploy-backend.yml"
 
 jobs:
-  deploy-artifacts-bucket:
+  deploy-backend:
     runs-on: ubuntu-latest
 
     permissions:
@@ -30,32 +30,18 @@ jobs:
           aws cloudformation deploy \
             --stack-name artifacts-stack \
             --template-file infra/backend/artifacts-bucket.yml \
-            --capabilities CAPABILITY_NAMED_IAM
-
-      - name: Get bucket name from exports
-        id: bucket
-        run: |
-          BUCKET=$(aws cloudformation list-exports \
-            --query "Exports[?Name=='ArtifactsBucketName'].Value" \
-            --output text)
-          
-          if [ -z "$BUCKET" ]; then
-            echo "Bucket export not found!"
-            exit 1
-          fi
-
-          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
-          echo "Using bucket: $BUCKET"
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              BucketName=my-bucket-artifacts-198226511774
 
       - name: Zip Lambda function
         run: |
-          cd backend/visitor-counter
-          zip -r ../../visitor-counter.zip .
+          zip -r visitor-counter.zip backend/lambdas/visitor_counter
 
-      - name: Upload Lambda package
+      - name: Upload to S3
         run: |
           aws s3 cp visitor-counter.zip \
-            s3://${{ steps.bucket.outputs.bucket }}/visitor-counter.zip
+            s3://my-bucket-artifacts-198226511774/visitor-counter.zip
 
       - name: Deploy backend stack
         run: |
@@ -64,7 +50,7 @@ jobs:
             --template-file infra/backend/backend-stack.yml \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
-              ArtifactBucketName=${{ steps.bucket.outputs.bucket }} \
+              ArtifactBucketName=my-bucket-artifacts-198226511774 \
               ArtifactKey=visitor-counter.zip
 
       - name: Debug CloudFormation Failure
@@ -72,5 +58,5 @@ jobs:
         run: |
           aws cloudformation describe-stack-events \
             --stack-name backend-stack \
-            --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='REVIEW_IN_PROGRESS' || ResourceStatus=='ROLLBACK_IN_PROGRESS'].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
+            --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='ROLLBACK_IN_PROGRESS'].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
             --output table
