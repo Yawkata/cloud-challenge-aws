@@ -38,7 +38,7 @@ jobs:
         run: |
           zip -r visitor-counter.zip backend/lambdas/visitor_counter
 
-      - name: Upload to S3
+      - name: Upload Lambda to S3
         run: |
           aws s3 cp visitor-counter.zip \
             s3://my-bucket-artifacts-198226511774/visitor-counter.zip
