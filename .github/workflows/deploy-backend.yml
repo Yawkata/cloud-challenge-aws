@@ -37,7 +37,8 @@ jobs:
 
       - name: Zip Lambda function
         run: |
-          zip -r visitor-counter.zip backend/lambdas/visitor_counter
+          cd backend/lambdas/visitor_counter
+          zip -r ../../../visitor-counter.zip .
 
       - name: Calculate Lambda hash
         id: hash
