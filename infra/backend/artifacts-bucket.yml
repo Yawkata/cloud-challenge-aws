@@ -13,3 +13,10 @@ Resources:
       BucketName: !Ref BucketName
       VersioningConfiguration:
         Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: CleanupOldLambdaZips
+            Status: Enabled
+            Prefix: "visitor-counter-"
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 7

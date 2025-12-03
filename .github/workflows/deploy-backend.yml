@@ -42,12 +42,12 @@ jobs:
       - name: Calculate Lambda hash
         id: hash
         run: |
-          HASH=$(sha256sum visitor-counter.zip | awk '{print $1}')
-          echo "LAMBDA_HASH=$HASH" >> $GITHUB_ENV
+          ZIP_FILE="visitor-counter-$(sha256sum visitor-counter.zip | awk '{print $1}').zip"
+          echo "ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
 
       - name: Upload Lambda to S3
         run: |
-          aws s3 cp visitor-counter.zip s3://my-bucket-artifacts-198226511774/visitor-counter.zip
+          aws s3 cp ${{ env.ZIP_FILE }} s3://my-bucket-artifacts-198226511774/${{ env.ZIP_FILE }}
 
       - name: Deploy backend stack
         run: |
@@ -57,8 +57,7 @@ jobs:
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               ArtifactBucketName=my-bucket-artifacts-198226511774 \
-              ArtifactKey=visitor-counter.zip \
-              LambdaCodeHash=${{ env.LAMBDA_HASH }}
+              ArtifactKey=${{ env.ZIP_FILE }} 
 
       - name: Initialize DynamoDB visitor count
         run: |
