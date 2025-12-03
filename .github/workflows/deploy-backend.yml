@@ -6,6 +6,7 @@ on:
     paths:
       - "infra/backend/**"
       - ".github/workflows/deploy-backend.yml"
+      - "backend/lambdas/**"
 
 jobs:
   deploy-backend:
@@ -34,14 +35,17 @@ jobs:
             --parameter-overrides \
               BucketName=my-bucket-artifacts-198226511774
 
+      - name: Define ZIP file name
+        run: |
+          echo "ZIP_FILE=visitor-counter-$(date +%s).zip" >> $GITHUB_ENV
+
       - name: Zip Lambda function
         run: |
-          zip -r visitor-counter.zip backend/lambdas/visitor_counter
+          zip -r "${{ env.ZIP_FILE }}" backend/lambdas/visitor_counter
 
       - name: Upload Lambda to S3
         run: |
-          aws s3 cp visitor-counter.zip \
-            s3://my-bucket-artifacts-198226511774/visitor-counter.zip
+          aws s3 cp "${{ env.ZIP_FILE }}" s3://my-bucket-artifacts-198226511774/${{ env.ZIP_FILE }}
 
       - name: Deploy backend stack
         run: |
@@ -51,13 +55,24 @@ jobs:
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               ArtifactBucketName=my-bucket-artifacts-198226511774 \
-              ArtifactKey=visitor-counter.zip
+              ArtifactKey=${{ env.ZIP_FILE }}
 
       - name: Initialize DynamoDB visitor count
         run: |
-          aws dynamodb put-item \
+          EXISTS=$(aws dynamodb get-item \
             --table-name VisitorCounterIAC \
-            --item '{"id": {"S": "visitor_count"}, "count": {"N": "0"}}'
+            --key '{"id": {"S": "visitor_count"}}' \
+            --query "Item.id.S" \
+            --output text 2>/dev/null || echo "None")
+
+          if [ "$EXISTS" = "None" ]; then
+            echo "Item does not exist — creating it..."
+            aws dynamodb put-item \
+              --table-name VisitorCounterIAC \
+              --item '{"id": {"S": "visitor_count"}, "count": {"N": "0"}}'
+          else
+            echo "Item already exists — skipping initialization."
+          fi
 
       - name: Debug CloudFormation Failure
         if: failure()
