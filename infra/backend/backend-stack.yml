@@ -6,6 +6,8 @@ Parameters:
     Type: String
   ArtifactKey:
     Type: String
+  LambdaCodeHash:
+    Type: String
 
 Resources:
   VisitorCounterLambdaRole:
@@ -56,3 +58,5 @@ Resources:
       Code:
         S3Bucket: !Ref ArtifactBucketName
         S3Key: !Ref ArtifactKey
+    Metadata:
+      LambdaCodeHash: !Ref LambdaCodeHash
