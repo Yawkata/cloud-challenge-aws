@@ -32,13 +32,11 @@ jobs:
 
       - name: Upload Static Website Files to S3
         run: |
-          # 1. Fetch the actual bucket name from the deployed stack outputs
           BUCKET_NAME=$(aws cloudformation describe-stacks \
             --stack-name static-site-stack \
             --query "Stacks[0].Outputs[?OutputKey=='StaticSiteBucketName'].OutputValue" \
             --output text)
 
-          # 2. Use aws s3 sync to upload files
           aws s3 sync ./web s3://$BUCKET_NAME \
             --delete \
             --acl private \
@@ -49,13 +47,11 @@ jobs:
       - name: Invalidate CloudFront Cache
         run: |
           echo "Fetching CloudFront Distribution ID..."
-          # 1. Fetch the Distribution ID from the deployed stack outputs
           DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
             --stack-name static-site-stack \
             --query "Stacks[0].Outputs[?OutputKey=='StaticSiteDistributionId'].OutputValue" \
             --output text)
 
-          # 2. Create the invalidation request for all paths
           aws cloudfront create-invalidation \
             --distribution-id $DISTRIBUTION_ID \
             --paths "/*"
