@@ -56,3 +56,100 @@ Resources:
       Code:
         S3Bucket: !Ref ArtifactBucketName
         S3Key: !Ref ArtifactKey
+
+  VisitorCounterAPIIAC:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: VisitorCounterAPIIAC
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  VisitorCounterVisitorResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref VisitorCounterAPIIAC
+      ParentId: !GetAtt VisitorCounterAPIIAC.RootResourceId
+      PathPart: visitor
+
+  VisitorCounterOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VisitorCounterAPIIAC
+      ResourceId: !Ref VisitorCounterVisitorResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST,GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  VisitorCounterPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VisitorCounterAPIIAC
+      ResourceId: !Ref VisitorCounterVisitorResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VisitorCounterLambdaIAC.Arn}/invocations
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  VisitorCounterGetMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref VisitorCounterAPIIAC
+      ResourceId: !Ref VisitorCounterVisitorResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: '{"message":"OK"}'
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  VisitorCounterLambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref VisitorCounterLambdaIAC
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${VisitorCounterAPIIAC}/*/*/visitor
+
+  VisitorCounterDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - VisitorCounterOptionsMethod
+      - VisitorCounterPostMethod
+      - VisitorCounterGetMethod
+    Properties:
+      RestApiId: !Ref VisitorCounterAPIIAC
+      StageName: test
+
+  
