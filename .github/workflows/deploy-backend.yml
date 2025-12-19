@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - "infra/backend/**"
+      - "infra/monitoring/**"
       - ".github/workflows/deploy-backend.yml"
       - "backend/lambdas/**"
 
@@ -84,3 +85,11 @@ jobs:
             --stack-name backend-stack \
             --query "StackEvents[?ResourceStatus=='CREATE_FAILED' || ResourceStatus=='ROLLBACK_IN_PROGRESS'].[LogicalResourceId, ResourceStatus, ResourceStatusReason]" \
             --output table
+
+      - name: Deploy monitoring stack
+        run: |
+          aws cloudformation deploy \
+            --stack-name monitoring-stack \
+            --template-file infra/monitoring/monitoring-stack.yml \
+            --parameter-overrides \
+              LambdaFunctionName=VisitorCounterLambdaIAC
