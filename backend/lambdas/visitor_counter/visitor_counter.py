@@ -5,6 +5,7 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('VisitorCounterIAC')
 
 def lambda_handler(event, context):
+    raise Exception("Intentional test error for CloudWatch alarm")
 
     response = table.get_item(Key={'id': 'visitor_count'})
 
