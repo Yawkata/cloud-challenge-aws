@@ -36,36 +36,25 @@ jobs:
             --parameter-overrides \
               BucketName=my-bucket-artifacts-198226511774
 
-      - name: Zip Visitor counter Lambda function
+      - name: Zip, hash and upload all lambdas
         run: |
-          cd backend/lambdas/visitor_counter
-          zip -r ../../../visitor-counter.zip .
+          LAMBDAS=("visitor_counter" "slack_notifier")
+          BUCKET="my-bucket-artifacts-198226511774"
 
-      - name: Calculate Visitor counter Lambda hash
-        id: visitor_counter_hash
-        run: |
-          ZIP_FILE="visitor-counter-$(sha256sum visitor-counter.zip | awk '{print $1}').zip"
-          echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
+          for LAMBDA in "${LAMBDAS[@]}"; do
+            echo "Processing Lambda: $LAMBDA"
 
-      - name: Upload Visitor counter Lambda to S3
-        run: |
-          aws s3 cp visitor-counter.zip s3://my-bucket-artifacts-198226511774/${{ steps.visitor_counter_hash.outputs.zip_file }}
+            ZIP_NAME="$LAMBDA.zip"
+            cd backend/lambdas/"$LAMBDA"/
+            zip -r ../../../"$ZIP_NAME" .
+            cd ../../../
+            HASHED_ZIP="$LAMBDA-$(sha256sum "$ZIP_NAME" | awk '{print $1}').zip"
+            
+            aws s3 cp "$ZIP_NAME" s3://$BUCKET/$HASHED_ZIP
 
-      - name: Zip Slack notifier Lambda
-        run: |
-          cd backend/lambdas/slack_notifier
-          zip -r ../../../slack-notifier.zip .
-
-      - name: Calculate Slack notifier Lambda hash
-        id: slack_notifier_hash
-        run: |
-          ZIP_FILE="slack-notifier-$(sha256sum slack-notifier.zip | awk '{print $1}').zip"
-          echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
-
-      - name: Upload Slack notifier Lambda to S3
-        run: |
-          aws s3 cp slack-notifier.zip s3://my-bucket-artifacts-198226511774/${{ steps.slack_notifier_hash.outputs.zip_file }}
-
+            VAR_NAME=$(echo "${LAMBDA^^}_ZIP")
+            echo "$VAR_NAME=$HASHED_ZIP" >> $GITHUB_ENV
+          done
 
       - name: Deploy backend stack
         run: |
@@ -75,7 +64,7 @@ jobs:
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               ArtifactBucketName=my-bucket-artifacts-198226511774 \
-              ArtifactKey=${{ steps.visitor_counter_hash.outputs.zip_file }} 
+              ArtifactKey=${{ env.VISITOR_COUNTER_ZIP }} 
 
       - name: Initialize DynamoDB visitor count
         run: |
@@ -111,4 +100,4 @@ jobs:
             --parameter-overrides \
               LambdaFunctionToMonitor=VisitorCounterLambdaIAC \
               ArtifactBucketName=my-bucket-artifacts-198226511774 \
-              ArtifactKey=${{ steps.slack_notifier_hash.outputs.zip_file }} 
+              ArtifactKey=${{ env.SLACK_NOTIFIER_ZIP }} 
