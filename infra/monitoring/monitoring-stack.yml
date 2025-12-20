@@ -2,9 +2,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Monitoring stack
 
 Parameters:
-  LambdaFunctionName:
+  LambdaFunctionToMonitor:
     Type: String
-    Description: Name of the Lambda function to monitor
+  ArtifactBucketName:
+    Type: String
+  ArtifactKey:
+    Type: String
 
 Resources:
   AlertTopic:
@@ -15,13 +18,13 @@ Resources:
   LambdaErrorsAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmName: !Sub "${LambdaFunctionName}-Errors-Alarm"
+      AlarmName: !Sub "${LambdaFunctionToMonitor}-Errors-Alarm"
       AlarmDescription: Alarm when Lambda function reports errors
       Namespace: AWS/Lambda
       MetricName: Errors
       Dimensions:
         - Name: FunctionName
-          Value: !Ref LambdaFunctionName
+          Value: !Ref LambdaFunctionToMonitor
       Statistic: Sum
       Period: 60
       EvaluationPeriods: 1
@@ -30,3 +33,38 @@ Resources:
       AlarmActions:
         - !Ref AlertTopic
       TreatMissingData: notBreaching
+
+  SlackNotifierLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SlackWebhookSSMRead
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cloud-resume/slack/webhook
+
+  SlackNotifierLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SlackNotifierLambda
+      Runtime: python3.11
+      Handler: slack_notifier.lambda_handler
+      Timeout: 10
+      Role: !GetAtt SlackNotifierLambdaRole.Arn
+      Code:
+        S3Bucket: !Ref ArtifactBucketName
+        S3Key: !Ref ArtifactKey
+
