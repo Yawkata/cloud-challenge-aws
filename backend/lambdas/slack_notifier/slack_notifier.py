@@ -1,6 +1,7 @@
 import json
 import boto3
 import urllib.request
+from datetime import datetime
 
 ssm = boto3.client('ssm')
 
@@ -17,6 +18,8 @@ def lambda_handler(event, context):
     alarm_state = sns_message.get("NewStateValue")
     alarm_reason = sns_message.get("NewStateReason")
     alarm_timestamp = sns_message.get("StateChangeTime")
+    dt = datetime.strptime(alarm_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+    formatted_time = dt.strftime("%Y-%m-%d %I:%M:%S %p %Z")
 
     message = {
         "text": (
@@ -24,8 +27,9 @@ def lambda_handler(event, context):
             f"*Alarm*: {alarm_name}\n"
             f"*State*: {alarm_state}\n"
             f"*Reason*: {alarm_reason}\n"
-            f"*Time*: {alarm_timestamp}"
-        )
+            f"*Time*: {formatted_time}"
+        ),
+        "icon_emoji": ":rotating_light:"
     }
 
     req = urllib.request.Request(
