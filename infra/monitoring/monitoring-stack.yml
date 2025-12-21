@@ -33,6 +33,25 @@ Resources:
       AlarmActions:
         - !Ref AlertTopic
       TreatMissingData: notBreaching
+      
+  LambdaLatencyAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${LambdaFunctionToMonitor}-Latency-Alarm"
+      AlarmDescription: "Alarm when Lambda p95 duration exceeds 1000 ms"
+      Namespace: AWS/Lambda
+      MetricName: Duration
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref LambdaFunctionToMonitor
+      Statistic: p95
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 1000
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref AlertTopic
+      TreatMissingData: notBreaching
 
   SlackNotifierLambdaRole:
     Type: AWS::IAM::Role

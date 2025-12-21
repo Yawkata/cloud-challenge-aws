@@ -1,11 +1,12 @@
 import json
 import boto3
+import time
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('VisitorCounterIAC')
 
 def lambda_handler(event, context):
-    raise Exception("Test labmbda failure")
+    time.sleep(1)
     response = table.get_item(Key={'id': 'visitor_count'})
 
     response = table.update_item(
@@ -17,6 +18,7 @@ def lambda_handler(event, context):
     )
 
     new_count = int(response['Attributes']['count'])
+
 
     return {
         'statusCode': 200,

@@ -2,6 +2,7 @@ import json
 import boto3
 import urllib.request
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 ssm = boto3.client('ssm')
 
@@ -18,8 +19,9 @@ def lambda_handler(event, context):
     alarm_state = sns_message.get("NewStateValue")
     alarm_reason = sns_message.get("NewStateReason")
     alarm_timestamp = sns_message.get("StateChangeTime")
-    dt = datetime.strptime(alarm_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
-    formatted_time = dt.strftime("%Y-%m-%d %I:%M:%S %p %Z")
+    dt_utc = datetime.strptime(alarm_timestamp, "%Y-%m-%dT%H:%M:%S.%f%z")
+    dt_bulgaria = dt_utc.astimezone(ZoneInfo("Europe/Sofia"))
+    formatted_time = dt_bulgaria.strftime("%Y-%m-%d %I:%M:%S %p %Z")
 
     message = {
         "text": (
