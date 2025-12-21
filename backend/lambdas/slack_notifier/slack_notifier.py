@@ -11,12 +11,22 @@ def lambda_handler(event, context):
     )
     slack_webhook_url = parameter["Parameter"]["Value"]
 
-    message = {
-        "text": "ALERT!!! LMBDA IS NOT WORKING",
-        "icon_emoji": ":rotating_light:"
-    }
+    sns_message_str = event["Records"][0]["Sns"]["Message"]
+    sns_message = json.loads(sns_message_str)
+    alarm_name = sns_message.get("AlarmName")
+    alarm_state = sns_message.get("NewStateValue")
+    alarm_reason = sns_message.get("NewStateReason")
+    alarm_timestamp = sns_message.get("StateChangeTime")
 
-    payload = {"\"text\": \"ALERT!!! LMBDA IS NOT WORKING\", \"icon_emoji\": \":rotating_light:\""}
+    message = {
+        "text": (
+            f"*CloudWatch Alarm Triggered*\n"
+            f"*Alarm*: {alarm_name}\n"
+            f"*State*: {alarm_state}\n"
+            f"*Reason*: {alarm_reason}\n"
+            f"*Time*: {alarm_timestamp}"
+        )
+    }
 
     req = urllib.request.Request(
         slack_webhook_url,
