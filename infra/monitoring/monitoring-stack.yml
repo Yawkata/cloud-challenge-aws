@@ -95,6 +95,14 @@ Resources:
                   - ssm:GetParameter
                 Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cloud-resume/slack/webhook
 
+              - Effect: Allow
+                Action:
+                    - kms:Decrypt
+                Resource: "*"
+                Condition:
+                  StringEquals:
+                    kms:ViaService: !Sub ssm.${AWS::Region}.amazonaws.com
+
   SlackNotifierLambda:
     Type: AWS::Lambda::Function
     Properties:
