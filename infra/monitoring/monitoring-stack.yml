@@ -33,7 +33,7 @@ Resources:
       AlarmActions:
         - !Ref AlertTopic
       TreatMissingData: notBreaching
-      
+
   LambdaLatencyAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -44,7 +44,7 @@ Resources:
       Dimensions:
         - Name: FunctionName
           Value: !Ref LambdaFunctionToMonitor
-      Statistic: p95
+      ExtendedStatistic: p95
       Period: 60
       EvaluationPeriods: 2
       Threshold: 1000
@@ -101,4 +101,3 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: sns.amazonaws.com
       SourceArn: !Ref AlertTopic
-
