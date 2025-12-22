@@ -6,7 +6,6 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('VisitorCounterIAC')
 
 def lambda_handler(event, context):
-    time.sleep(1)
     response = table.get_item(Key={'id': 'visitor_count'})
 
     response = table.update_item(

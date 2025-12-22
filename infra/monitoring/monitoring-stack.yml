@@ -53,6 +53,26 @@ Resources:
         - !Ref AlertTopic
       TreatMissingData: notBreaching
 
+  LambdaInvocationSpikeAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${LambdaFunctionToMonitor}-Invocation-Spike-Alarm"
+      AlarmDescription: "Alarm when Lambda invocation count spikes abnormally"
+      Namespace: AWS/Lambda
+      MetricName: Invocations
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref LambdaFunctionToMonitor
+      Statistic: Sum
+      Period: 30
+      EvaluationPeriods: 1
+      Threshold: 10
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref AlertTopic
+      TreatMissingData: notBreaching
+
+
   SlackNotifierLambdaRole:
     Type: AWS::IAM::Role
     Properties:
