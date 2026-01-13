@@ -58,7 +58,7 @@ jobs:
           
           echo "CloudFront invalidation request sent for $DISTRIBUTION_ID."
 
-  test:
+  test-frontend:
     name: Smoke Test Deployment
     runs-on: ubuntu-latest
     needs: deploy_content
@@ -78,7 +78,7 @@ jobs:
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:
-          command: npm run cypress:run 
+          command: npm run cypress:run --spec 'cypress/e2e/smoke.cy.js'
           wait-on: https://ivanovv.dev
         env:
           CYPRESS_BASE_URL: https://ivanovv.dev

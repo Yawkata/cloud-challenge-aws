@@ -9,6 +9,8 @@ on:
       - ".github/workflows/deploy-backend.yml"
       - "backend/lambdas/**"
 
+      - "cypress/**"
+
 jobs:
   deploy-backend:
     runs-on: ubuntu-latest
@@ -64,7 +66,7 @@ jobs:
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               ArtifactBucketName=my-bucket-artifacts-198226511774 \
-              ArtifactKey=${{ env.VISITOR_COUNTER_ZIP }} 
+              ArtifactKey=${{ env.VISITOR_COUNTER_ZIP }}
 
       - name: Initialize DynamoDB visitor count
         run: |
@@ -101,3 +103,35 @@ jobs:
               LambdaFunctionToMonitor=VisitorCounterLambdaIAC \
               ArtifactBucketName=my-bucket-artifacts-198226511774 \
               ArtifactKey=${{ env.SLACK_NOTIFIER_ZIP }} 
+
+
+  test-backend:
+    name: Backend Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies (Cypress)
+        run: npm ci
+
+      - name: Fetch API Gateway URL
+        run: |
+          URL=$(aws cloudformation describe-stacks \
+            --stack-name backend-stack \
+            --query "Stacks[0].Outputs[?OutputKey=='APIUrl'].OutputValue" \
+            --output text)
+          echo "CYPRESS_API_URL=$URL" >> $GITHUB_ENV
+
+      - name: Run Backend API Smoke Tests
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run cypress:run --spec 'cypress/e2e/api.cy.js'
+
