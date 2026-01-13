@@ -149,9 +149,15 @@ Resources:
       - VisitorCounterGetMethod
     Properties:
       RestApiId: !Ref VisitorCounterAPIIAC
+
+  VisitorCounterStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref VisitorCounterAPIIAC
+      DeploymentId: !Ref VisitorCounterDeployment
       StageName: test
 
 Outputs:
   APIUrl:
     Description: "Full URL for the visitor counter resource"
-    Value: !Sub "https://${VisitorCounterAPIIAC}.execute-api.${AWS::Region}.amazonaws.com/${VisitorCounterDeployment.StageName}/${VisitorCounterVisitorResource.PathPart}"
+    Value: !Sub "https://${VisitorCounterAPIIAC}.execute-api.${AWS::Region}.amazonaws.com/${VisitorCounterStage}/${VisitorCounterVisitorResource.PathPart}"
