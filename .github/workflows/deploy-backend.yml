@@ -114,6 +114,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::198226511774:role/GitHubActionsBackendDeployRole
+          aws-region: eu-north-1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
