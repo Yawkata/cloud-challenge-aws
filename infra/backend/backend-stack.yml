@@ -151,7 +151,7 @@ Resources:
       RestApiId: !Ref VisitorCounterAPIIAC
       StageName: test
 
-  Outputs:
-    APIUrl:
-      Description: "Full URL for the visitor counter resource"
-      Value: !Sub "https://${VisitorCounterAPIIAC}.execute-api.${AWS::Region}.amazonaws.com/${VisitorCounterDeployment.StageName}/${VisitorCounterVisitorResource.PathPart}"
+Outputs:
+  APIUrl:
+    Description: "Full URL for the visitor counter resource"
+    Value: !Sub "https://${VisitorCounterAPIIAC}.execute-api.${AWS::Region}.amazonaws.com/${VisitorCounterDeployment.StageName}/${VisitorCounterVisitorResource.PathPart}"

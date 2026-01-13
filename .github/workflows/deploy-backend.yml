@@ -133,5 +133,5 @@ jobs:
       - name: Run Backend API Smoke Tests
         uses: cypress-io/github-action@v6
         with:
-          command: npm run cypress:run --spec 'cypress/e2e/api.cy.js'
+          command: npx cypress run --spec cypress/e2e/api.cy.js
 
