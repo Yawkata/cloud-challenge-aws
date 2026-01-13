@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://m675wg46oi.execute-api.eu-north-1.amazonaws.com/test";
+const API_BASE_URL = "https://vi9ausvov7.execute-api.eu-north-1.amazonaws.com/test";
 
 export async function getVisitorCount() {
     const response = await fetch(`${API_BASE_URL}/visitor`);
