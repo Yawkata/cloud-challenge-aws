@@ -160,4 +160,4 @@ Resources:
 Outputs:
   APIUrl:
     Description: "Full URL for the visitor counter resource"
-    Value: !Sub "https://${VisitorCounterAPIIAC}.execute-api.${AWS::Region}.amazonaws.com/${VisitorCounterStage}/${VisitorCounterVisitorResource.PathPart}"
+    Value: !Sub "https://${VisitorCounterAPIIAC}.execute-api.${AWS::Region}.amazonaws.com/${VisitorCounterStage}/visitor"
