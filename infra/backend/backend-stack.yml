@@ -29,6 +29,12 @@ Resources:
                   - dynamodb:GetItem
                   - dynamodb:UpdateItem
                 Resource: !GetAtt VisitorCounterTable.Arn
+
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                Resource: !GetAtt VisitorIPsTable.Arn
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
@@ -43,6 +49,19 @@ Resources:
         - AttributeName: id
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
+
+  VisitorIPsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: VisitorIPsIAC
+      AttributeDefinitions:
+        - AttributeName: ip
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ip
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
 
   VisitorCounterLambdaIAC:
     Type: AWS::Lambda::Function
