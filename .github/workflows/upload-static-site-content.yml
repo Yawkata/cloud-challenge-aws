@@ -6,7 +6,7 @@ on:
     paths:
       - "web/**"
 
-      - "cypress/**"
+      - "cypress/e2e/smoke.cy.js"
       - "package.json"
       - "package-lock.json"
       - "cypress.config.js"

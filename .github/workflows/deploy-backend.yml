@@ -9,7 +9,7 @@ on:
       - ".github/workflows/deploy-backend.yml"
       - "backend/lambdas/**"
 
-      - "cypress/**"
+      - "cypress/e2e/api.cy.js"
 
 jobs:
   deploy-backend:

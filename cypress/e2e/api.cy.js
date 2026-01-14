@@ -16,4 +16,21 @@ describe('Backend Smoke Test: Visitor Counter API', () => {
       });
     });
   });
+
+  it('handles unexpected request payload safely', () => {
+    cy.request({
+      method: 'POST',
+      url: Cypress.env('API_URL'),
+      body: {
+        foo: 'bar',
+        random: 123,
+      }
+    })
+      .then((response) => {
+        expect(response.status).to.eq(200)
+        expect(response.body).to.have.property('visitor_count')
+        expect(response.body.visitor_count).to.be.a('number')
+      })
+  })
+
 });
