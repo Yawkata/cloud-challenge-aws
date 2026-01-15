@@ -35,6 +35,19 @@ Resources:
                   - dynamodb:GetItem
                   - dynamodb:PutItem
                 Resource: !GetAtt VisitorIPsTable.Arn
+
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cloud-resume/visitor-counter/ip-salt
+
+              - Effect: Allow
+                Action:
+                    - kms:Decrypt
+                Resource: "*"
+                Condition:
+                  StringEquals:
+                    kms:ViaService: !Sub ssm.${AWS::Region}.amazonaws.com
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
@@ -61,7 +74,6 @@ Resources:
         - AttributeName: ip
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
-
 
   VisitorCounterLambdaIAC:
     Type: AWS::Lambda::Function
