@@ -12,7 +12,7 @@ describe('Backend Smoke Test: Visitor Counter API', () => {
       cy.request('POST', Cypress.env('API_URL')).then((secondResponse) => {
         
         const secondCount = secondResponse.body.visitor_count;
-        expect(secondCount, 'The counter should increase by at least 1').to.be.greaterThan(firstCount);
+        expect(secondCount, 'Counter should NOT increment for same IP').to.eq(firstCount);
       });
     });
   });
