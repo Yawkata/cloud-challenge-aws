@@ -9,7 +9,7 @@ on:
       - ".github/workflows/deploy-backend.yml"
       - "backend/lambdas/**"
 
-      - "cypress/e2e/api.cy.js"
+      - "cypress/e2e/visitor-api.cy.js"
 
 jobs:
   deploy-backend:
@@ -143,5 +143,5 @@ jobs:
       - name: Run Backend API Smoke Tests
         uses: cypress-io/github-action@v6
         with:
-          command: npx cypress run --spec cypress/e2e/api.cy.js
+          command: npx cypress run --spec cypress/e2e/visitor-api.cy.js
 

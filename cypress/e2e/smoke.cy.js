@@ -12,5 +12,16 @@ describe('Frontend Smoke Test: Visitor Counter Integration', () => {
         expect(Number.isNaN(count)).to.be.false
         expect(count).to.be.at.least(0)
       })
+
+    cy.reload()
+
+    cy.get('#visitor-count')
+      .invoke('text')
+      .then((text) => {
+        const secondCount = Number(text)
+
+        expect(Number.isNaN(secondCount)).to.be.false
+        expect(secondCount).to.eq(firstCount)
+      })
   })
 })
