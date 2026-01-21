@@ -59,7 +59,7 @@ jobs:
           echo "CloudFront invalidation request sent for $DISTRIBUTION_ID."
 
   test-frontend:
-    name: Smoke Test Deployment
+    name: Frontend Smoke Test
     runs-on: ubuntu-latest
     needs: deploy_content
       

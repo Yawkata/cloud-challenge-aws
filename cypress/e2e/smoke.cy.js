@@ -6,11 +6,11 @@ describe('Frontend Smoke Test: Visitor Counter Integration', () => {
       .should('exist')
       .invoke('text')
       .then((text) => {
-        const count = Number(text)
+        firstCount = Number(text)
 
         expect(text).to.not.be.empty
-        expect(Number.isNaN(count)).to.be.false
-        expect(count).to.be.at.least(0)
+        expect(Number.isNaN(firstCount)).to.be.false
+        expect(firstCount).to.be.at.least(0)
       })
 
     cy.reload()
