@@ -1,5 +1,7 @@
 describe('Frontend Smoke Test: Visitor Counter Integration', () => {
   it('loads the homepage and displays a valid visitor count from the API', () => {
+    let firstCount
+
     cy.visit('/')
 
     cy.get('#visitor-count')
