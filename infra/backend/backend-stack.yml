@@ -125,7 +125,7 @@ Resources:
           - StatusCode: 200
             ResponseParameters:
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST,GET'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
       MethodResponses:
         - StatusCode: 200
@@ -150,34 +150,11 @@ Resources:
           ResponseParameters:
             method.response.header.Access-Control-Allow-Origin: true
 
-  VisitorCounterGetMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref VisitorCounterAPIIAC
-      ResourceId: !Ref VisitorCounterVisitorResource
-      HttpMethod: GET
-      AuthorizationType: NONE
-      Integration:
-        Type: MOCK
-        RequestTemplates:
-          application/json: '{"statusCode": 200}'
-        IntegrationResponses:
-          - StatusCode: 200
-            ResponseTemplates:
-              application/json: '{"message":"OK"}'
-            ResponseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'*'"
-      MethodResponses:
-        - StatusCode: 200
-          ResponseParameters:
-            method.response.header.Access-Control-Allow-Origin: true
-
   VisitorCounterDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
       - VisitorCounterOptionsMethod
       - VisitorCounterPostMethod
-      - VisitorCounterGetMethod
     Properties:
       RestApiId: !Ref VisitorCounterAPIIAC
 
@@ -187,6 +164,11 @@ Resources:
       RestApiId: !Ref VisitorCounterAPIIAC
       DeploymentId: !Ref VisitorCounterDeployment
       StageName: test
+      MethodSettings:
+      - ResourcePath: "/visitor"
+        HttpMethod: "POST"
+        ThrottlingRateLimit: 5
+        ThrottlingBurstLimit: 10
 
 Outputs:
   APIUrl:
