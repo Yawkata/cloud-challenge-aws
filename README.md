@@ -1,24 +1,25 @@
-# ☁️ Cloud Resume Project — AWS | DevOps | Security | Automation
+# Cloud Resume Project — AWS | DevOps | Security | Automation
 
-This project is a **production-grade, cloud-native personal portfolio platform** designed to demonstrate real-world skills in **AWS architecture, infrastructure as code, DevOps automation, security engineering, and monitoring**. It goes beyond a static resume by implementing a fully automated, multi-account AWS environment with CI/CD pipelines, real-time visitor tracking, CDN-backed global delivery, and enterprise-grade security controls.
+This project is a **production-grade, cloud-native personal portfolio platform** demonstrating real-world skills in **AWS architecture, infrastructure as code, DevOps automation, security engineering, and monitoring**. It extends beyond a static resume with a fully automated, multi-account AWS environment, CI/CD pipelines, serverless backend services, and globally distributed content delivery.
 
 ### What This Project Solves
-- Showcases **end-to-end cloud system design** instead of a simple frontend-only portfolio
-- Demonstrates **automated infrastructure provisioning** using CloudFormation and GitHub Actions
-- Implements **secure, scalable backend services** with API Gateway, Lambda, and DynamoDB
-- Applies **real-world security practices** including IAM least privilege, encrypted secrets, TLS, DNSSEC, and CDN origin protection
-- Provides **monitoring and incident visibility** through CloudWatch alarms and Slack notifications
+- **end-to-end cloud system design** instead of a simple frontend-only portfolio
+- **automated infrastructure provisioning** using CloudFormation and GitHub Actions
+- **secure, scalable backend services** with API Gateway, Lambda, and DynamoDB
+- **real-world security practices** including IAM least privilege, encrypted secrets, TLS, DNSSEC, and CDN origin protection
+- **monitoring and incident visibility** through CloudWatch alarms and Slack notifications
 
 ### Live Deployment
 🌐 https://ivanovv.dev
 
 ### Credits & Inspiration
-This project is inspired by **_The Cloud Resume Challenge Cookbook (AWS Edition)_** by **Forrest Brazeal**, which provided the architectural blueprint and learning framework behind the design, automation, and security practices implemented here.
+This project is guided by **_The Cloud Resume Challenge Guidebook (AWS Edition)_** by **Forrest Brazeal**, which provided the architectural foundation for its design, automation, and security practices.
+
 
 ## Architecture Overview
 
 ### System Diagram  
-> _Insert architecture diagram here_
+![Architecture](docs/architecture.drawio.svg)
 
 ---
 
@@ -160,7 +161,7 @@ npx cypress run --spec cypress/e2e/visitor-api.cy.js
 
 This project prioritizes a "Security-First" mindset, moving beyond default configurations to implement enterprise-grade hardening across three main layers: Identity, Infrastructure, and the Network Edge.
 
-### Identity & Access Management (Check Your Privilege)
+### Identity & Access Management
 * **IAM Identity Center (SSO)**: Implemented AWS IAM Identity Center to manage a multi-account environment. Access is granted through centralized Permission Sets, eliminating the need for local IAM users in the production account. MFA is applied to every user.
 * **Principle of Least Privilege (PoLP)**: Every execution role (Lambda, GitHub OIDC) is manually crafted to allow only the minimum required actions on specific resource ARNs. No `AdministratorAccess` is used for runtime services.
 * **OIDC-Based Deployment**: GitHub Actions interacts with AWS using **OpenID Connect**, leveraging short-lived STS tokens instead of static, long-lived access keys.
@@ -178,20 +179,11 @@ This project prioritizes a "Security-First" mindset, moving beyond default confi
 * **Hardware-Backed Security**: All sensitive parameters are encrypted at rest using **AWS Key Management Service (KMS)** with customer-managed keys (CMK), ensuring that secret data is never exposed in plaintext within code or logs.
 * **Data Integrity**: To comply with privacy best practices, visitor IP addresses are never stored in plaintext. The backend utilizes **SHA-256 hashing** with a salt (stored in SSM) to anonymize user data before it reaches the database. This allows for unique visitor tracking without compromising individual privacy.
 
-#### Secure Parameter Validation
-Verify encrypted parameters and access controls:
-
-```bash
-aws ssm get-parameter \
-  --name /cloud-resume/visitor-counter/ip-salt \
-  --with-decryption
-```
-
-## Testing & Monitoring (Operational Excellence)
+## Testing & Monitoring
 
 A production-grade system is only as good as its visibility. This project implements a series of tests and a proactive monitoring pipeline to ensure 99.9% uptime and immediate incident response.
 
-### Automated Quality Assurance (Browser Up)
+### Automated Quality Assurance
 I utilize a "Shift-Left" testing approach where every code change is validated before it reaches the production environment.
 * **End-to-End (E2E) Testing**: **Cypress** is integrated into the CI/CD pipeline to simulate real user journeys. The tests verify that the frontend correctly fetches and displays data from the AWS backend.
 * **API Integration Testing**: Automated checks ensure the `visitor_counter` Lambda handles requests correctly, including edge cases like malformed JSON or unexpected payloads.
@@ -221,8 +213,6 @@ When an alarm threshold is breached, the following automated workflow occurs:
 
 > **Example Incident Alert:**
 > ![Slack Notification Example](docs/Slack-notification-example.JPG)
-
-> *Above: Real-time alert showing a Lambda Error trigger*
 
 ### Incident Response Workflow
 1.  **Detection**: CloudWatch identifies a breach (e.g., p95 Latency > 1000ms).
